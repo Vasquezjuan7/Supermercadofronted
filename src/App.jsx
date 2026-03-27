@@ -8,12 +8,11 @@ function App() {
   const [cargandoIA, setCargandoIA] = useState(false)
 
   // --- CONFIGURACIÓN DE LINKS ---
-  // Cambiamos localhost por tu link de Railway
+  // Backend de Java en Railway (MongoDB)
   const API_JAVA = 'https://supermercadobackendd-production.up.railway.app/api/productos'
   
-  // Por ahora, si la IA corre en tu PC, dejamos el puerto 5000. 
-  // Si luego subes la IA a Render/Railway, cambiarás este link también.
-  const API_IA_PYTHON = 'http://localhost:5000/detectar' 
+  // URL de tu Inteligencia Artificial en RENDER 🚀
+  const API_IA_PYTHON = 'https://supermercado-ia-f7bm.onrender.com/detectar' 
 
   // 1. Leer productos (Desde Java -> Atlas)
   const obtenerProductos = () => {
@@ -24,7 +23,7 @@ function App() {
 
   useEffect(() => { obtenerProductos() }, [])
 
-  // 2. Detectar con YOLO (Desde tu servidor Python local)
+  // 2. Detectar con YOLOv8 (Desde Render Cloud)
   const detectarConIA = async (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -45,7 +44,7 @@ function App() {
       }
     } catch (err) {
       console.error("Error con la IA:", err)
-      alert("Asegúrate de tener abierto VS Code con el script de Python (app.py) encendido")
+      alert("La IA está despertando o hubo un error. Por favor, intenta de nuevo en 30 segundos.")
     } finally {
       setCargandoIA(false)
     }
@@ -77,13 +76,13 @@ function App() {
     <div style={{ padding: '20px', color: 'white', backgroundColor: '#242424', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
       <header style={{ textAlign: 'center', marginBottom: '40px' }}>
         <h1 style={{ color: '#4CAF50' }}>🛒 Supermercado Cloud + IA 🤖</h1>
-        <p>Panel de Administración en Tiempo Real (Railway + MongoDB)</p>
+        <p>Panel de Administración UCC (Vercel + Railway + Render)</p>
       </header>
       
       {/* SECCIÓN DE IA */}
       <div style={{ backgroundColor: '#333', padding: '15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #4CAF50', maxWidth: '600px', margin: '0 auto 20px auto' }}>
         <h3>Escanear Estante con YOLOv8</h3>
-        <p style={{ fontSize: '0.8em', color: '#aaa' }}>Sube una foto para detectar productos faltantes automáticamente</p>
+        <p style={{ fontSize: '0.8em', color: '#aaa' }}>La imagen se procesará en la nube de Render</p>
         <input type="file" accept="image/*" onChange={detectarConIA} />
         {cargandoIA && <p style={{ color: '#4CAF50', fontWeight: 'bold' }}>Analizando imagen con Inteligencia Artificial...</p>}
       </div>
