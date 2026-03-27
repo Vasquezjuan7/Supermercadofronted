@@ -1,129 +1,173 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import toast, { Toaster } from 'react-hot-toast'
+import { LayoutDashboard, ShoppingBasket, ScanFace, Trash2, MapPin } from 'lucide-react'
 
 function App() {
-  const [productos, setProductos] = useState([])
-  const [nombre, setNombre] = useState('')
-  const [pasillo, setPasillo] = useState('')
-  const [cargandoIA, setCargandoIA] = useState(false)
+  const [products, setProducts] = useState([])
+  const [name, setName] = useState('')
+  const [aisle, setAisle] = useState('Aisle 1')
+  const [loadingIA, setLoadingIA] = useState(false)
+  const [aisleFilter, setAisleFilter] = useState('All')
 
-  // --- CONFIGURACIÓN DE LINKS ---
-  // Backend de Java en Railway (MongoDB)
-  const API_JAVA = 'https://supermercadobackendd-production.up.railway.app/api/productos'
-  
-  // URL de tu Inteligencia Artificial en RENDER 🚀
+  // --- URLS ACTUALIZADAS ---
+  const API_JAVA = 'https://supermercadobackendd-production.up.railway.app/api/products'
   const API_IA_PYTHON = 'https://supermercado-ia-f7bm.onrender.com/detectar' 
 
-  // 1. Leer productos (Desde Java -> Atlas)
-  const obtenerProductos = () => {
+  const fetchProducts = () => {
     axios.get(API_JAVA)
-      .then(res => setProductos(res.data))
-      .catch(err => console.error("Error al obtener de la nube:", err))
+      .then(res => setProducts(res.data))
+      .catch(err => toast.error("Error connecting to database"))
   }
 
-  useEffect(() => { obtenerProductos() }, [])
+  useEffect(() => { fetchProducts() }, [])
 
-  // 2. Detectar con YOLOv8 (Desde Render Cloud)
-  const detectarConIA = async (e) => {
+  const detectWithIA = async (e) => {
     const file = e.target.files[0]
     if (!file) return
 
     const formData = new FormData()
     formData.append('image', file)
     
-    setCargandoIA(true)
+    setLoadingIA(true)
+    const loadToast = toast.loading("Analyzing image...")
+    
     try {
       const resIA = await axios.post(API_IA_PYTHON, formData)
-      const productoIA = resIA.data.producto
+      // La IA devuelve "producto" en el JSON, lo pasamos a nuestro estado "name"
+      const productFound = resIA.data.producto 
       
-      if (productoIA !== "unknown") {
-        setNombre(productoIA) 
-        setPasillo("Por clasificar")
+      if (productFound && productFound !== "unknown") {
+        setName(productFound)
+        toast.success(`Detected: ${productFound}`, { id: loadToast })
       } else {
-        alert("La IA no reconoció el objeto")
+        toast.error("Object not recognized", { id: loadToast })
       }
     } catch (err) {
-      console.error("Error con la IA:", err)
-      alert("La IA está despertando o hubo un error. Por favor, intenta de nuevo en 30 segundos.")
+      toast.error("IA Server is starting. Try again in 20s.", { id: loadToast })
     } finally {
-      setCargandoIA(false)
+      setLoadingIA(false)
     }
   }
 
-  // 3. Crear producto (POST a Java en Railway)
-  const guardarProducto = (e) => {
+  const saveProduct = (e) => {
     e.preventDefault()
-    if (!nombre || !pasillo) return alert("Por favor llena ambos campos")
+    if (!name || !aisle) return toast.error("Please fill all fields")
     
-    axios.post(API_JAVA, { nombre, pasillo })
+    // IMPORTANTE: Los nombres 'name' y 'aisle' deben coincidir con tu clase Product.java
+    axios.post(API_JAVA, { name, aisle })
       .then(() => {
-        setNombre(''); setPasillo('')
-        obtenerProductos() // Refresca la lista automáticamente
+        setName(''); 
+        fetchProducts()
+        toast.success("Product saved successfully")
       })
-      .catch(err => console.error("Error al guardar en la nube:", err))
+      .catch(() => toast.error("Error saving to cloud"))
   }
 
-  // 4. Eliminar producto (DELETE a Java en Railway)
-  const eliminarProducto = (id) => {
-    if (window.confirm("¿Estás seguro de eliminar este producto de la nube?")) {
-      axios.delete(`${API_JAVA}/${id}`)
-        .then(() => obtenerProductos())
-        .catch(err => console.error("Error al eliminar:", err))
-    }
+  const deleteProduct = (id) => {
+    axios.delete(`${API_JAVA}/${id}`)
+      .then(() => {
+        fetchProducts()
+        toast.success("Product removed")
+      })
+      .catch(() => toast.error("Delete failed"))
   }
+
+  const filteredItems = aisleFilter === 'All' 
+    ? products 
+    : products.filter(p => p.aisle === aisleFilter)
 
   return (
-    <div style={{ padding: '20px', color: 'white', backgroundColor: '#242424', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
-      <header style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ color: '#4CAF50' }}>🛒 Supermercado Cloud + IA 🤖</h1>
-        <p>Panel de Administración UCC (Vercel + Railway + Render)</p>
-      </header>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc', color: '#1e293b', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <Toaster position="top-right" />
       
-      {/* SECCIÓN DE IA */}
-      <div style={{ backgroundColor: '#333', padding: '15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #4CAF50', maxWidth: '600px', margin: '0 auto 20px auto' }}>
-        <h3>Escanear Estante con YOLOv8</h3>
-        <p style={{ fontSize: '0.8em', color: '#aaa' }}>La imagen se procesará en la nube de Render</p>
-        <input type="file" accept="image/*" onChange={detectarConIA} />
-        {cargandoIA && <p style={{ color: '#4CAF50', fontWeight: 'bold' }}>Analizando imagen con Inteligencia Artificial...</p>}
-      </div>
+      {/* SIDEBAR */}
+      <nav style={{ width: '280px', backgroundColor: '#0f172a', color: 'white', padding: '24px' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#10b981', marginBottom: '32px' }}>
+          <ShoppingBasket size={28} /> UCC Market AI
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button onClick={() => setAisleFilter('All')} style={navBtnStyle}>
+            <LayoutDashboard size={20} /> Dashboard
+          </button>
+          <button onClick={() => setAisleFilter('Aisle 1')} style={navBtnStyle}>
+            <MapPin size={20} /> Aisle 1 (Dairy)
+          </button>
+          <button onClick={() => setAisleFilter('Aisle 2')} style={navBtnStyle}>
+            <MapPin size={20} /> Aisle 2 (Grains)
+          </button>
+        </div>
+      </nav>
 
-      {/* FORMULARIO DE GUARDADO */}
-      <form onSubmit={guardarProducto} style={{ marginBottom: '30px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <input 
-          placeholder="Nombre detectado" 
-          value={nombre} 
-          onChange={e => setNombre(e.target.value)} 
-          style={{ padding: '12px', borderRadius: '4px', border: 'none', width: '200px' }}
-        />
-        <input 
-          placeholder="Asignar Pasillo" 
-          value={pasillo} 
-          onChange={e => setPasillo(e.target.value)} 
-          style={{ padding: '12px', borderRadius: '4px', border: 'none', width: '150px' }}
-        />
-        <button type="submit" style={{ padding: '12px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-          Confirmar y Guardar
-        </button>
-      </form>
+      {/* MAIN CONTENT */}
+      <main style={{ flex: 1, padding: '40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>Inventory Management</h1>
+          <div style={{ display: 'flex', gap: '16px' }}>
+             <div style={cardStat}><strong>{products.length}</strong> <span>Total Items</span></div>
+          </div>
+        </div>
 
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <h2>📦 Inventario en Nube (Atlas)</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {productos.length === 0 && <p>Cargando productos o inventario vacío...</p>}
-          {productos.map(p => (
-            <li key={p.id} style={{ backgroundColor: '#333', margin: '10px 0', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: '5px solid #4CAF50' }}>
-              <span>
-                <strong style={{ color: '#4CAF50', fontSize: '1.2em' }}>{p.nombre}</strong> 
-                <br />
-                <span style={{ color: '#ccc', fontSize: '0.9em' }}>📍 Pasillo: {p.pasillo}</span>
-              </span>
-              <button onClick={() => eliminarProducto(p.id)} style={{ backgroundColor: '#ff4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer' }}>Eliminar</button>
-            </li>
-          ))}
-        </ul>
-      </div>
+        {/* AI SCANNER */}
+        <section style={glassCard}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><ScanFace color="#10b981"/> AI Smart Scan</h3>
+              <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Upload a photo to detect products automatically</p>
+            </div>
+            <input type="file" accept="image/*" onChange={detectWithIA} id="ia-upload" style={{ display: 'none' }} />
+            <label htmlFor="ia-upload" style={primaryBtn}>Start Scanning</label>
+          </div>
+        </section>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
+          {/* FORM */}
+          <div style={whiteCard}>
+            <h4 style={{ marginBottom: '20px' }}>Add New Product</h4>
+            <form onSubmit={saveProduct} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <input 
+                placeholder="Product Name" 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                style={inputStyle} 
+              />
+              <select value={aisle} onChange={e => setAisle(e.target.value)} style={inputStyle}>
+                <option>Aisle 1</option>
+                <option>Aisle 2</option>
+                <option>Aisle 3</option>
+              </select>
+              <button type="submit" style={successBtn}>Add to Stock</button>
+            </form>
+          </div>
+
+          {/* TABLE */}
+          <div style={whiteCard}>
+            <h4 style={{ marginBottom: '20px' }}>Current Inventory: {aisleFilter}</h4>
+            {filteredItems.map(p => (
+              <div key={p.id} style={itemRow}>
+                <div>
+                  <div style={{ fontWeight: '600' }}>{p.name}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{p.aisle}</div>
+                </div>
+                <button onClick={() => deleteProduct(p.id)} style={deleteBtn}><Trash2 size={18}/></button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
+
+// ESTILOS
+const navBtnStyle = { display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '12px 16px', backgroundColor: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', borderRadius: '8px', transition: '0.2s', textAlign: 'left' }
+const cardStat = { backgroundColor: 'white', padding: '12px 24px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column' }
+const glassCard = { background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '24px' }
+const whiteCard = { background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }
+const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }
+const primaryBtn = { padding: '12px 24px', backgroundColor: '#0f172a', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }
+const successBtn = { padding: '12px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }
+const itemRow = { display: 'flex', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid #f1f5f9' }
+const deleteBtn = { color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }
 
 export default App
