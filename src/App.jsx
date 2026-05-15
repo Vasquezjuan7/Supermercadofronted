@@ -69,7 +69,7 @@ function LoginScreen({ onLogin }) {
           </div>
           <button type="submit" className="login-btn"><Lock size={16} />Iniciar Sesión</button>
         </form>
-        <p className="login-footer">Credenciales: Juan / Juan2026</p>
+
       </div>
       <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#f1f5f9', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', fontSize: '0.85rem' } }} />
     </div>
