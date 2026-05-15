@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/proxy/backend/:path*",
+      "destination": "http://18.219.0.19:8081/:path*"
+    },
+    {
+      "source": "/proxy/ia/:path*",
+      "destination": "http://18.219.0.19:8080/:path*"
+    }
+  ]
+}

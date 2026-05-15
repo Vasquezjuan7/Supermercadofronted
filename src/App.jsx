@@ -9,8 +9,8 @@ import {
 } from 'lucide-react'
 import './App.css'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://18.219.0.19:8081/api/products'
-const API_IA = import.meta.env.VITE_API_IA || 'http://18.219.0.19:8080/detect_all'
+const API_BASE = '/proxy/backend/api/products'
+const API_IA = '/proxy/ia/detect_all'
 const SOUND_IN = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'
 const SOUND_OUT = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'
 
