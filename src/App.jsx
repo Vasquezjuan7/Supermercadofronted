@@ -171,8 +171,16 @@ function Dashboard({ currentUser, onLogout }) {
   }
   const handleDeleteUser = (id) => {
     if (id === 1) { toast.error('No puedes eliminar al admin principal'); return }
-    const updated = getUsers().filter(u => u.id !== id); saveUsers(updated); setUsers(updated)
     toast.success('Usuario eliminado')
+  }
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return
+    try {
+      await axios.delete(`${API_BASE.replace('/api/products', '/api/products')}/${id}`)
+      toast.success('Producto eliminado')
+      fetchProducts()
+    } catch (e) { toast.error('Error al eliminar producto') }
   }
 
   const navItems = [
@@ -246,7 +254,7 @@ function Dashboard({ currentUser, onLogout }) {
           <div className="glass-card" style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div className="card-header"><span className="card-title">Product Inventory</span><span style={{ fontSize: '0.72rem', color: '#475569' }}>{products.length} items</span></div>
             <div className="card-body">
-              <div className="table-header"><span>Product</span><span>Location</span><span>Quantity</span><span>Status</span></div>
+              <div className="table-header"><span>Product</span><span>Location</span><span>Quantity</span><span>Status</span>{isAdmin && <span>Acciones</span>}</div>
               <div className="inventory-grid">
                 {products.map((p, i) => (
                   <div key={p.id} className="product-row" style={{ animationDelay: `${i * 0.08}s` }}>
@@ -254,6 +262,13 @@ function Dashboard({ currentUser, onLogout }) {
                     <div className="product-location">{p.aisle || 'General'}</div>
                     <div className="product-qty">{p.quantity}<span>units</span></div>
                     <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot" />{p.quantity > 2 ? 'Healthy' : 'Low Stock'}</span></div>
+                    {isAdmin && (
+                      <div className="product-actions">
+                        <button className="delete-btn-table" onClick={() => handleDeleteProduct(p.id)} title="Eliminar Producto">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

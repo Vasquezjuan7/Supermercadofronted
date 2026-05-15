@@ -1037,3 +1037,29 @@ body {
   .stat-card { background: #f8f8f8 !important; color: #000 !important; }
   body { background: #fff; color: #000; }
 }
+
+/* Boton de Eliminar en Tabla */
+.delete-btn-table {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn-table:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+}
+
+.product-actions {
+  display: flex;
+  justify-content: center;
+}
+
