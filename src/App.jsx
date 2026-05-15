@@ -31,9 +31,9 @@ function getUsers() {
   return JSON.parse(raw)
 }
 function saveUsers(users) { localStorage.setItem('ucc_users', JSON.stringify(users)) }
-function getSession() { const s = localStorage.getItem('ucc_session'); return s ? JSON.parse(s) : null }
-function saveSession(user) { localStorage.setItem('ucc_session', JSON.stringify(user)) }
-function clearSession() { localStorage.removeItem('ucc_session') }
+function getSession() { return null } // No recuperar sesión al recargar
+function saveSession(user) { sessionStorage.setItem('ucc_session', JSON.stringify(user)) }
+function clearSession() { sessionStorage.removeItem('ucc_session') }
 
 // ══════════════════════════════════════
 // LOGIN SCREEN
@@ -349,7 +349,7 @@ function Dashboard({ currentUser, onLogout }) {
 // APP ROOT (Auth Router)
 // ══════════════════════════════════════
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(getSession())
+  const [currentUser, setCurrentUser] = useState(null) // Siempre empezar en el Login
 
   const handleLogin = (user) => setCurrentUser(user)
   const handleLogout = () => { clearSession(); setCurrentUser(null); toast.success('Sesión cerrada') }
