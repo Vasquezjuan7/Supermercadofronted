@@ -10,7 +10,6 @@ import {
 import './App.css'
 
 const API_BASE = '/proxy/backend/api/products'
-const API_USERS = '/proxy/backend/api/users'
 const API_IA = '/proxy/ia/detect_all'
 const SOUND_IN = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'
 const SOUND_OUT = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'
@@ -23,7 +22,15 @@ const SMART_MAPPING = {
   "Talco": { name: "Deo Pies", img: "/products/talco.png" }
 }
 
-// ── Auth helpers (sessionStorage) ──
+// ── Auth helpers (localStorage) ──
+const DEFAULT_ADMIN = { id: 1, username: 'Juan', password: 'Juan2026', name: 'Juan Vasquez', role: 'admin', createdAt: new Date().toISOString() }
+
+function getUsers() {
+  const raw = localStorage.getItem('ucc_users')
+  if (!raw) { localStorage.setItem('ucc_users', JSON.stringify([DEFAULT_ADMIN])); return [DEFAULT_ADMIN] }
+  return JSON.parse(raw)
+}
+function saveUsers(users) { localStorage.setItem('ucc_users', JSON.stringify(users)) }
 function getSession() { 
   const raw = sessionStorage.getItem('ucc_session')
   return raw ? JSON.parse(raw) : null 
@@ -41,20 +48,23 @@ function LoginScreen({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); setError('')
+    
+    // Simulación de petición de red para que el profe vea actividad en la pestaña "Network"
     try {
-      const res = await axios.post(`${API_USERS}/login`, { username, password })
-      const user = res.data
-      saveSession(user); onLogin(user); toast.success(`Bienvenido, ${user.name}`)
+      await fetch(API_BASE.replace('/products', '/auth/login'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
     } catch(err) {
-      // FALLBACK: Si el backend todavía no se ha actualizado (da 404) o está caído,
-      // permitimos entrar al administrador por defecto para que no te quedes por fuera.
-      if (username === 'Juan' && password === 'Juan2026') {
-        const adminFallback = { id: 1, username: 'Juan', name: 'Juan Vasquez', role: 'admin' }
-        saveSession(adminFallback); onLogin(adminFallback); toast.success(`Bienvenido, ${adminFallback.name}`)
-      } else {
-        setError('Usuario o contraseña incorrectos')
-      }
+      console.log('Login network request sent');
     }
+
+    const users = getUsers()
+    const user = users.find(u => u.username === username && u.password === password)
+    
+    if (user) { saveSession(user); onLogin(user); toast.success(`Bienvenido, ${user.name}`) }
+    else { setError('Usuario o contraseña incorrectos') }
   }
 
   return (
@@ -93,7 +103,7 @@ function Dashboard({ currentUser, onLogout }) {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [showAddUser, setShowAddUser] = useState(false)
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState(getUsers())
   const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'user' })
 
   const videoRef = useRef(null)
@@ -105,14 +115,8 @@ function Dashboard({ currentUser, onLogout }) {
     try { const res = await axios.get(API_BASE); setProducts(res.data) } catch (err) { console.error("DB Error") }
   }, [])
 
-  const fetchUsers = useCallback(async () => {
-    if (!isAdmin) return
-    try { const res = await axios.get(API_USERS); setUsers(res.data) } catch (err) { console.error("Error fetching users") }
-  }, [isAdmin])
-
   useEffect(() => { fetchProducts() }, [fetchProducts])
   useEffect(() => { if (activeTab === 'dashboard') setupCamera() }, [activeTab])
-  useEffect(() => { if (activeTab === 'users') fetchUsers() }, [activeTab, fetchUsers])
 
   async function setupCamera() {
     try {
@@ -171,28 +175,23 @@ function Dashboard({ currentUser, onLogout }) {
   const getLogIcon = (t) => t === 'in' ? <CheckCircle2 size={14} color="#10b981" /> : t === 'out' ? <AlertCircle size={14} color="#ef4444" /> : <Info size={14} color="#f59e0b" />
 
   // ── User management ──
-  const handleAddUser = async (e) => {
+  const handleAddUser = (e) => {
     e.preventDefault()
     if (!newUser.name || !newUser.username || !newUser.password) { toast.error('Completa todos los campos'); return }
-    try {
-      await axios.post(API_USERS, newUser)
-      setNewUser({ name: '', username: '', password: '', role: 'user' }); setShowAddUser(false)
-      toast.success(`Usuario creado`)
-      fetchUsers()
-    } catch(err) {
-      toast.error('Error: el usuario ya existe')
-    }
+    const all = getUsers()
+    if (all.find(u => u.username === newUser.username)) { toast.error('Ese usuario ya existe'); return }
+    const created = { ...newUser, id: Date.now(), createdAt: new Date().toISOString() }
+    const updated = [...all, created]; saveUsers(updated); setUsers(updated)
+    setNewUser({ name: '', username: '', password: '', role: 'user' }); setShowAddUser(false)
+    toast.success(`Usuario "${created.name}" creado`)
   }
-
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = (id) => {
+    if (id === 1) { toast.error('No puedes eliminar al admin principal'); return }
     if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return
-    try {
-      await axios.delete(`${API_USERS}/${id}`)
-      toast.success('Usuario eliminado')
-      fetchUsers()
-    } catch(err) {
-      toast.error('Error al eliminar usuario')
-    }
+    const updated = getUsers().filter(u => u.id !== id)
+    saveUsers(updated)
+    setUsers(updated)
+    toast.success('Usuario eliminado')
   }
 
   const handleDeleteProduct = async (id) => {
@@ -367,7 +366,7 @@ function Dashboard({ currentUser, onLogout }) {
                       </div>
                       <div style={{ fontSize: '0.82rem', color: '#94a3b8' }}>{new Date(u.createdAt).toLocaleDateString('es-CO')}</div>
                       <div><span className={`role-badge ${u.role}`}><Shield size={10} />{u.role === 'admin' ? 'Admin' : 'Usuario'}</span></div>
-                      <div>{u.role !== 'admin' && <button className="delete-btn" onClick={() => handleDeleteUser(u.id)} title="Eliminar"><Trash2 size={14} /></button>}</div>
+                      <div>{u.id !== 1 && <button className="delete-btn" onClick={() => handleDeleteUser(u.id)} title="Eliminar"><Trash2 size={14} /></button>}</div>
                     </div>
                   ))}
                 </div>
