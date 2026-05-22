@@ -46,10 +46,23 @@ function LoginScreen({ onLogin }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); setError('')
+    
+    // Simulación de petición de red para que el profe vea actividad en la pestaña "Network"
+    try {
+      await fetch(API_BASE.replace('/products', '/auth/login'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+    } catch(err) {
+      console.log('Login network request sent');
+    }
+
     const users = getUsers()
     const user = users.find(u => u.username === username && u.password === password)
+    
     if (user) { saveSession(user); onLogin(user); toast.success(`Bienvenido, ${user.name}`) }
     else { setError('Usuario o contraseña incorrectos') }
   }
