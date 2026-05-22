@@ -171,6 +171,10 @@ function Dashboard({ currentUser, onLogout }) {
   }
   const handleDeleteUser = (id) => {
     if (id === 1) { toast.error('No puedes eliminar al admin principal'); return }
+    if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return
+    const updated = getUsers().filter(u => u.id !== id)
+    saveUsers(updated)
+    setUsers(updated)
     toast.success('Usuario eliminado')
   }
 
