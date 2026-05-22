@@ -148,7 +148,7 @@ function Dashboard({ currentUser, onLogout }) {
       const fd = new FormData(); fd.append('image', blob, 'shelf.jpg')
       const res = await fetch(API_IA, { method: 'POST', body: fd }); const data = await res.json()
       if (data.products) await processShelfChanges(data.products)
-    } catch (e) {} finally { setLoadingIA(false); isProcessing.current = false }
+    } catch (e) { console.error("Error conectando con la IA:", e); toast.error("Error de conexión IA"); } finally { setLoadingIA(false); isProcessing.current = false }
   }
 
   useEffect(() => { const i = setInterval(captureAndDetect, 800); return () => clearInterval(i) }, [captureAndDetect, products, shelfState, activeTab])

@@ -7,12 +7,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/proxy/backend': {
-        target: 'http://18.219.0.19:8081',
+        target: 'http://18.118.160.170:8081',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy\/backend/, ''),
       },
       '/proxy/ia': {
-        target: 'http://18.219.0.19:8080',
+        target: 'http://18.118.160.170:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy\/ia/, ''),
       },
