@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/proxy/backend/:path*",
-      "destination": "http://18.118.160.170:8081/:path*"
+      "destination": "http://52.14.226.191:8081/:path*"
     },
     {
       "source": "/proxy/ia/:path*",
-      "destination": "http://18.118.160.170:8080/:path*"
+      "destination": "http://52.14.226.191:8080/:path*"
     }
   ]
 }
