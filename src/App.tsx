@@ -115,7 +115,7 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
     <div className="login-screen">
       <div className="login-card">
         <div className="flex justify-center mb-4">
-          <img src="/logo_circular.png" alt="Vision Pro Logo" style={{ width: '64px', height: '64px', borderRadius: '50%', boxShadow: '0 0 20px rgba(0, 240, 255, 0.4)' }} />
+          <img src="/logo_circular.png" alt="Vision Pro Logo" className="logo-pulse" style={{ width: '64px', height: '64px', borderRadius: '50%', boxShadow: '0 0 20px rgba(0, 240, 255, 0.4)' }} />
         </div>
         <h2 className="login-title">VISION <span className="text-gradient">PRO</span></h2>
         <p className="login-subtitle">Neural Interface & Inventory Management</p>
