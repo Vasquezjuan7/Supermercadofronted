@@ -3,9 +3,11 @@ import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import {
   ScanFace, Package, PackagePlus, RefreshCcw, LayoutDashboard,
-  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus, MessageSquare, Send
+  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus, MessageSquare, Send, FileText
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import './App.css'
 
 const API_BASE = '/proxy/backend/api/products'
@@ -353,18 +355,40 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
     catch (e) { toast.error('Error al actualizar stock') }
   }
 
-  const exportToCSV = () => {
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + "ID,Name,Sector,Quantity,Price (COP),Total Value (COP)\n"
-      + products.map(e => `${e.id},${e.name},${e.aisle},${e.quantity},${e.price||0},${(e.quantity||0)*(e.price||0)}`).join("\n")
-    const encodedUri = encodeURI(csvContent)
-    const link = document.createElement("a")
-    link.setAttribute("href", encodedUri)
-    link.setAttribute("download", `inventory_export_${new Date().toISOString().split('T')[0]}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    toast.success('Datos exportados correctamente')
+  const exportToPDF = () => {
+    const doc = new jsPDF()
+    
+    // Título
+    doc.setFontSize(16)
+    doc.text("Reporte de Inventario - VISION PRO", 14, 15)
+    doc.setFontSize(10)
+    doc.text(`Fecha de exportación: ${new Date().toLocaleString('es-CO')}`, 14, 22)
+    doc.text(`Total en inventario: ${formatCOP(totalValue)}`, 14, 28)
+    
+    // Preparar columnas y filas
+    const columns = ["ID", "Producto", "Sector", "Precio", "Cantidad", "Valor Total"]
+    const rows = products.map(p => [
+      p.id.slice(-6).toUpperCase(),
+      p.name,
+      p.aisle || 'General',
+      formatCOP(p.price || 0),
+      (p.quantity || 0).toString(),
+      formatCOP((p.quantity || 0) * (p.price || 0))
+    ])
+
+    // Dibujar tabla
+    autoTable(doc, {
+      head: [columns],
+      body: rows,
+      startY: 35,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 240, 255], textColor: [0, 0, 0] },
+      styles: { fontSize: 9 }
+    })
+
+    // Descargar
+    doc.save(`inventario-${new Date().toISOString().slice(0,10)}.pdf`)
+    toast.success('PDF generado correctamente')
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -550,7 +574,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
         {activeTab === 'inventory' && (
           <div style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '1.5rem' }}>
-              <button className="btn" onClick={exportToCSV}><Download size={16}/><span>Exportar Datos</span></button>
+              <button className="btn" onClick={exportToPDF}><FileText size={16}/><span>Descargar PDF</span></button>
               {can('edit_inventory') && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/><span>{showAddProduct ? 'Cancelar' : 'Agregar Artículo'}</span></button>}
             </div>
 
