@@ -168,6 +168,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
   const [chatTarget, setChatTarget] = useState('general')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [chatInput, setChatInput] = useState('')
+  const [showMobileContacts, setShowMobileContacts] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -808,10 +809,36 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
               ))}
             </div>
             
-            <div className="chat-main">
-              <div style={{ padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 'bold', color: '#fff' }}>
-                {chatTarget === 'general' ? 'Canal General' : users.find(u => String(u.id) === chatTarget)?.name || 'Cargando...'}
+            <div className="chat-main" style={{ position: 'relative' }}>
+              <div style={{ padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 'bold', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{chatTarget === 'general' ? 'Canal General' : users.find(u => String(u.id) === chatTarget)?.name || 'Cargando...'}</span>
+                
+                {/* Botón de contactos móvil */}
+                <button 
+                  className="mobile-contacts-btn" 
+                  onClick={() => setShowMobileContacts(!showMobileContacts)}
+                  style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px 12px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  <Users size={16} /> Contactos
+                  {Object.values(unreadCounts).some(c => c > 0) && <span className="unread-dot" style={{ position: 'static', marginLeft: '5px' }}></span>}
+                </button>
               </div>
+
+              {/* Menú Desplegable de Contactos */}
+              {showMobileContacts && (
+                <div style={{ position: 'absolute', top: '60px', right: '20px', background: 'rgba(15,15,20,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '10px', zIndex: 100, width: '220px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }}>
+                  <div className={`chat-contact ${chatTarget === 'general' ? 'active' : ''}`} onClick={() => { setChatTarget('general'); setShowMobileContacts(false); }} style={{ position: 'relative', marginBottom: '5px' }}>
+                    <MessageSquare size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> Canal General
+                    {unreadCounts['general'] > 0 && <span className="unread-dot"></span>}
+                  </div>
+                  {users.filter(u => String(u.id) !== String(currentUser?.id)).map(u => (
+                    <div key={u.id} className={`chat-contact ${chatTarget === String(u.id) ? 'active' : ''}`} onClick={() => { setChatTarget(String(u.id)); setShowMobileContacts(false); }} style={{ position: 'relative', marginBottom: '5px' }}>
+                      <Users size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }}/> {u.name}
+                      {unreadCounts[String(u.id)] > 0 && <span className="unread-dot"></span>}
+                    </div>
+                  ))}
+                </div>
+              )}
               
               <div className="chat-messages">
                 {messages.length === 0 ? (

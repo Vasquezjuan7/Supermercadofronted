@@ -875,3 +875,6 @@ body::before {
 
 .unread-dot { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; background: var(--accent-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--accent-cyan); }
 
+
+@media (min-width: 1025px) { .mobile-contacts-btn { display: none !important; } }
+@media (max-width: 1024px) { .chat-sidebar { display: none !important; } }
