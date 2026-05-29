@@ -3,7 +3,7 @@ import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import {
   ScanFace, Package, PackagePlus, RefreshCcw, LayoutDashboard,
-  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus, MessageSquare, Send, FileText, ChevronUp, ChevronDown
+  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus, MessageSquare, Send, FileText, ChevronUp, ChevronDown, ScanBarcode
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import jsPDF from 'jspdf'
@@ -113,7 +113,9 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
 
   return (
     <div className="login-screen">
+      <div className="cyber-overlay"></div>
       <div className="login-card">
+        <div className="scanner-line"></div>
         <div className="flex justify-center mb-4">
           <img src="/logo_circular.png" alt="Vision Pro Logo" className="logo-pulse" style={{ width: '64px', height: '64px', borderRadius: '50%', boxShadow: '0 0 20px rgba(0, 240, 255, 0.4)' }} />
         </div>
@@ -134,7 +136,10 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
               </button>
             </div>
           </div>
-          <button type="submit" className="login-btn">INITIALIZE SYSTEM</button>
+          <button type="submit" className="login-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              <ScanBarcode size={20} />
+              INITIALIZE SYSTEM
+            </button>
         </form>
       </div>
       <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(10,10,15,0.9)', color: '#fff', border: '1px solid rgba(0,240,255,0.3)', borderRadius: '12px' } }} />

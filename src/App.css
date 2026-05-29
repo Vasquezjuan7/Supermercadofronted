@@ -1016,3 +1016,44 @@ body::before {
 
 @media (min-width: 1025px) { .mobile-contacts-btn { display: none !important; } }
 @media (max-width: 1024px) { .chat-sidebar { display: none !important; } }
+
+/* Cyber Data Grid Overlay */
+.cyber-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  z-index: 1;
+  pointer-events: none;
+  animation: bgScroll 20s linear infinite;
+}
+
+@keyframes bgScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(30px); }
+}
+
+/* Holographic Barcode Scanner Line */
+.scanner-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 15px var(--accent-cyan), 0 0 30px var(--accent-cyan);
+  animation: scanVertical 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.8;
+}
+
+@keyframes scanVertical {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 0.8; }
+  45% { top: 100%; opacity: 0.8; }
+  50% { top: 100%; opacity: 0; }
+  100% { top: 100%; opacity: 0; }
+}
+
