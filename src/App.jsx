@@ -478,3 +478,16 @@ function Dashboard({ currentUser, onLogout }) {
     </div>
   )
 }
+
+// --------------------------------------
+// APP ROOT (Auth Router)
+// --------------------------------------
+export default function App() {
+  const [currentUser, setCurrentUser] = useState(getSession())
+
+  const handleLogin = (user) => setCurrentUser(user)
+  const handleLogout = () => { clearSession(); setCurrentUser(null); toast.success('Sesión cerrada') }
+
+  if (!currentUser) return <LoginScreen onLogin={handleLogin} />
+  return <Dashboard currentUser={currentUser} onLogout={handleLogout} />
+}
