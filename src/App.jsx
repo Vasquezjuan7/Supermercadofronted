@@ -2,10 +2,8 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import {
-  ScanFace, Package, PackagePlus, Loader2, RefreshCcw, LayoutDashboard,
-  ClipboardList, Bell, Settings, BarChart3, CheckCircle2, AlertCircle, Info,
-  Volume2, VolumeX, Printer, Zap, TrendingUp, AlertTriangle, Activity, Eye, EyeOff,
-  Users, LogOut, Trash2, UserPlus, Shield, Lock, Store, Play, Square, Video
+  ScanFace, Package, PackagePlus, RefreshCcw, LayoutDashboard,
+  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair
 } from 'lucide-react'
 import './App.css'
 
@@ -37,9 +35,9 @@ function getSession() {
 function saveSession(user) { sessionStorage.setItem('ucc_session', JSON.stringify(user)) }
 function clearSession() { sessionStorage.removeItem('ucc_session') }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════
 // LOGIN SCREEN
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════
 function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -53,7 +51,6 @@ function LoginScreen({ onLogin }) {
       const user = res.data
       saveSession(user); onLogin(user); toast.success(`Bienvenido, ${user.name}`)
     } catch(err) {
-      // Fallback solo por seguridad extrema si el backend sigue roto
       if (username === 'Juan' && password === 'Juan2026') {
         const adminFallback = { id: 1, username: 'Juan', name: 'Juan Vasquez', role: 'admin', supermercado: 'Sede Principal' }
         saveSession(adminFallback); onLogin(adminFallback); toast.success(`Bienvenido, ${adminFallback.name} (Modo Local)`)
@@ -66,35 +63,35 @@ function LoginScreen({ onLogin }) {
   return (
     <div className="login-screen">
       <div className="login-card">
-        <div className="login-logo"><ScanFace size={28} color="white" /></div>
-        <h2 className="login-title">UCC Vision Pro</h2>
-        <p className="login-subtitle">Ingresa tus credenciales para continuar</p>
-        {error && <div className="login-error"><AlertCircle size={14} />{error}</div>}
+        <div className="login-logo"><ScanFace size={32} color="white" /></div>
+        <h2 className="login-title">VISION <span className="text-gradient">PRO</span></h2>
+        <p className="login-subtitle">Neural Interface & Inventory Management</p>
+        {error && <div style={{color:'#ff0055', fontSize:'0.85rem', marginBottom:'1rem'}}><AlertTriangle size={14} style={{verticalAlign:'middle', marginRight:'5px'}}/>{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Usuario</label>
-            <input className="form-input" placeholder="Ingresa tu usuario" value={username} onChange={e => setUsername(e.target.value)} required />
+            <label className="form-label">OPERATOR ID</label>
+            <input className="form-input" placeholder="Enter your username" value={username} onChange={e => setUsername(e.target.value)} required />
           </div>
           <div className="form-group">
-            <label className="form-label">Contraseña</label>
+            <label className="form-label">SECURITY KEY</label>
             <div style={{ position: 'relative' }}>
               <input className="form-input" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required style={{ paddingRight: '40px' }} />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '10px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+              <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '10px', background: 'none', border: 'none', color: '#a0a5b5', cursor: 'pointer' }}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
-          <button type="submit" className="login-btn"><Lock size={16} />Iniciar Sesión</button>
+          <button type="submit" className="login-btn">INITIALIZE SYSTEM</button>
         </form>
       </div>
-      <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#f1f5f9', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', fontSize: '0.85rem' } }} />
+      <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(10,10,15,0.9)', color: '#fff', border: '1px solid rgba(0,240,255,0.3)', borderRadius: '12px' } }} />
     </div>
   )
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════
 // MAIN DASHBOARD
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════
 function Dashboard({ currentUser, onLogout }) {
   const [products, setProducts] = useState([])
   const [loadingIA, setLoadingIA] = useState(false)
@@ -103,16 +100,13 @@ function Dashboard({ currentUser, onLogout }) {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [soundEnabled, setSoundEnabled] = useState(true)
   
-  // IA Process State
   const [isAiActive, setIsAiActive] = useState(false)
   const [sessions, setSessions] = useState(JSON.parse(localStorage.getItem('ucc_sessions') || '[]'))
   const currentSession = useRef(null)
 
-  // Products State
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', aisle: '', quantity: 10 })
 
-  // Users State
   const [showAddUser, setShowAddUser] = useState(false)
   const [users, setUsers] = useState([])
   const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'user', supermercado: currentUser.supermercado || 'Sede Principal' })
@@ -147,10 +141,7 @@ function Dashboard({ currentUser, onLogout }) {
     const newLog = { id: Date.now(), msg, type, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
     setLogs(prev => [newLog, ...prev].slice(0, 10))
     playSound(type === 'in' ? SOUND_IN : SOUND_OUT)
-    
-    if (currentSession.current) {
-        currentSession.current.events.push(newLog)
-    }
+    if (currentSession.current) currentSession.current.events.push(newLog)
   }
 
   const processShelfChanges = async (detectedList) => {
@@ -163,11 +154,11 @@ function Dashboard({ currentUser, onLogout }) {
         const now = Date.now()
         if (lastActionTime.current[name] && (now - lastActionTime.current[name] < 1000)) continue
         lastActionTime.current[name] = now
-        addLog(`IA: ${diff > 0 ? 'Detectó' : 'Dejó de ver'} ${name} (${diff > 0 ? '+' : ''}${diff})`, diff > 0 ? 'info' : 'out')
+        addLog(`IA: ${diff > 0 ? 'Detectó' : 'Dejó de ver'} ${name} (${diff > 0 ? '+' : ''}${diff})`, diff > 0 ? 'in' : 'out')
         const pdb = products.find(p => p.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(p.name.toLowerCase()))
         if (pdb) {
           const newQty = Math.max(0, pdb.quantity + diff)
-          try { await axios.put(`${API_BASE}/${pdb.id}/stock`, null, { params: { quantity: newQty } }); addLog(`BD: Stock de ${name} → ${newQty}`, 'in') }
+          try { await axios.put(`${API_BASE}/${pdb.id}/stock`, null, { params: { quantity: newQty } }) }
           catch (e) { toast.error(`No se pudo guardar ${name}`) }
         } else { toast.error(`${name} no existe en la BD`) }
       }
@@ -185,36 +176,27 @@ function Dashboard({ currentUser, onLogout }) {
       const fd = new FormData(); fd.append('image', blob, 'shelf.jpg')
       const res = await fetch(API_IA, { method: 'POST', body: fd }); const data = await res.json()
       if (data.products) await processShelfChanges(data.products)
-    } catch (e) { console.error("Error conectando con la IA:", e); toast.error("Error de conexión IA"); setIsAiActive(false); } 
+    } catch (e) { console.error("Error", e); setIsAiActive(false); } 
     finally { setLoadingIA(false); isProcessing.current = false }
   }
 
   useEffect(() => { 
-      let i;
-      if (isAiActive) {
-          i = setInterval(captureAndDetect, 1000); 
-      }
+      let i; if (isAiActive) i = setInterval(captureAndDetect, 1000); 
       return () => clearInterval(i) 
   }, [isAiActive, products, shelfState, activeTab])
 
   const toggleAI = () => {
       if (!isAiActive) {
-          currentSession.current = {
-              id: Date.now(),
-              startTime: new Date().toLocaleString(),
-              events: [],
-              endTime: null
-          }
-          toast.success("Análisis IA Iniciado")
+          currentSession.current = { id: Date.now(), startTime: new Date().toLocaleString(), events: [], endTime: null }
+          toast.success("Enlace Neuronal Establecido")
       } else {
           if (currentSession.current) {
               currentSession.current.endTime = new Date().toLocaleString()
               const updatedSessions = [currentSession.current, ...sessions]
-              setSessions(updatedSessions)
-              localStorage.setItem('ucc_sessions', JSON.stringify(updatedSessions))
+              setSessions(updatedSessions); localStorage.setItem('ucc_sessions', JSON.stringify(updatedSessions))
               currentSession.current = null
           }
-          toast.success("Análisis IA Detenido")
+          toast.success("Enlace Neuronal Desconectado")
       }
       setIsAiActive(!isAiActive)
   }
@@ -222,339 +204,174 @@ function Dashboard({ currentUser, onLogout }) {
   const alerts = products.filter(p => p.quantity <= 2)
   const totalStock = products.reduce((s, p) => s + (p.quantity || 0), 0)
   const healthyCount = products.filter(p => p.quantity > 2).length
-  const getLogIcon = (t) => t === 'in' ? <CheckCircle2 size={14} color="#10b981" /> : t === 'out' ? <AlertCircle size={14} color="#ef4444" /> : <Info size={14} color="#f59e0b" />
 
-  // ── Product management ──
   const handleAddProduct = async (e) => {
     e.preventDefault()
-    if (!newProduct.name || !newProduct.aisle) { toast.error('Completa los campos obligatorios'); return }
-    try {
-      await axios.post(API_BASE, newProduct)
-      setNewProduct({ name: '', aisle: '', quantity: 10 })
-      setShowAddProduct(false)
-      toast.success(`Producto agregado`)
-      fetchProducts()
-    } catch(err) {
-      toast.error('Error al agregar el producto')
-    }
+    if (!newProduct.name || !newProduct.aisle) return toast.error('Faltan campos')
+    try { await axios.post(API_BASE, newProduct); setNewProduct({ name: '', aisle: '', quantity: 10 }); setShowAddProduct(false); toast.success('Producto agregado'); fetchProducts() } catch(err) { toast.error('Error al agregar') }
   }
-
-  // ── User management ──
-  const handleAddUser = async (e) => {
-    e.preventDefault()
-    if (!newUser.name || !newUser.username || !newUser.password || !newUser.supermercado) { toast.error('Completa todos los campos'); return }
-    try {
-      await axios.post(API_USERS, newUser)
-      setNewUser({ name: '', username: '', password: '', role: 'user', supermercado: currentUser.supermercado || 'Sede Principal' }); setShowAddUser(false)
-      toast.success(`Usuario creado`)
-      fetchUsers()
-    } catch(err) {
-      toast.error('Error: el usuario ya existe o hubo fallo')
-    }
-  }
-
-  const handleDeleteUser = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return
-    try {
-      await axios.delete(`${API_USERS}/${id}`)
-      toast.success('Usuario eliminado')
-      fetchUsers()
-    } catch(err) {
-      toast.error('Error al eliminar usuario')
-    }
-  }
-
   const handleDeleteProduct = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return
-    try {
-      await axios.delete(`${API_BASE.replace('/api/products', '/api/products')}/${id}`)
-      toast.success('Producto eliminado')
-      fetchProducts()
-    } catch (e) { toast.error('Error al eliminar producto') }
+    if (!window.confirm('¿Eliminar producto?')) return
+    try { await axios.delete(`${API_BASE}/${id}`); toast.success('Eliminado'); fetchProducts() } catch (e) { toast.error('Error') }
   }
 
   const navItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Resumen' },
-    { id: 'camera', icon: Video, label: 'Cámara IA' },
-    { id: 'inventory', icon: ClipboardList, label: 'Inventario' },
-    { id: 'reports', icon: BarChart3, label: 'Reportes' },
-    ...(isAdmin ? [{ id: 'users', icon: Users, label: 'Usuarios' }] : []),
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
+    { id: 'camera', icon: Crosshair, label: 'Neural Camera' },
+    { id: 'inventory', icon: Package, label: 'Inventory Core' },
+    { id: 'reports', icon: Activity, label: 'System Logs' },
+    ...(isAdmin ? [{ id: 'users', icon: Shield, label: 'Security' }] : []),
   ]
 
   return (
     <div className="app-shell">
-      <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#f1f5f9', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', fontSize: '0.85rem' } }} />
+      <Toaster position="top-right" toastOptions={{ style: { background: 'rgba(10,10,15,0.9)', color: '#fff', border: '1px solid rgba(0,240,255,0.3)', borderRadius: '12px' } }} />
 
-            {/* SIDEBAR */}
-      <nav className="sidebar no-print">
+      <nav className="sidebar">
         <div className="sidebar-logo-container">
-          <div className="sidebar-logo"><ScanFace size={22} color="white" /></div>
-          <span className="logo-text">Vision Pro</span>
+          <div className="sidebar-logo"><ScanFace size={24} color="white" /></div>
+          <span className="logo-text">VISION <span className="text-gradient">PRO</span></span>
         </div>
         {navItems.map(item => (
-          <div key={item.id} className={`nav-item ${activeTab === item.id ? 'active' : ''}`} onClick={() => setActiveTab(item.id)} title={item.label}>
+          <div key={item.id} className={`nav-item ${activeTab === item.id ? 'active' : ''}`} onClick={() => setActiveTab(item.id)}>
             <item.icon size={20} />
             <span className="nav-label">{item.label}</span>
           </div>
         ))}
         <div className="sidebar-bottom">
-          <div className="nav-item" onClick={() => setSoundEnabled(!soundEnabled)} title="Sonido">
-            {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} color="#ef4444" />}
-            <span className="nav-label">{soundEnabled ? 'Silenciar' : 'Sonido'}</span>
+          <div className="nav-item" onClick={() => setSoundEnabled(!soundEnabled)}>
+            {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} color="#ff0055" />}
+            <span className="nav-label">{soundEnabled ? 'Mute System' : 'Enable Audio'}</span>
           </div>
-          <div className="nav-item" onClick={onLogout} title="Cerrar Sesión">
-            <LogOut size={18} />
-            <span className="nav-label">Cerrar Sesión</span>
+          <div className="nav-item" onClick={onLogout}>
+            <LogOut size={20} />
+            <span className="nav-label">Disconnect</span>
           </div>
         </div>
       </nav>
 
-      {/* MAIN */}
       <main className="main-content">
         <div className="page-header">
           <div>
             <h1>{navItems.find(i => i.id === activeTab)?.label}</h1>
-            <p className="subtitle">UCC Vision Pro • {currentUser.supermercado || 'Sistema de Inventario'}</p>
+            <p className="subtitle">System Node // {currentUser.supermercado || 'Main Hub'}</p>
           </div>
-          <div className="header-actions no-print">
-            <div className="user-logged-info"><span className="user-dot" />{currentUser.name} ({currentUser.role === 'admin' ? 'Admin' : 'Operador'})</div>
-            <button className="btn" onClick={fetchProducts}><RefreshCcw size={14} /> Sincronizar</button>
-            <button className="logout-btn" onClick={onLogout}><LogOut size={14} /> Salir</button>
+          <div className="header-actions">
+            <div className="user-badge">
+              <span className="status-dot" /> {currentUser.name} [{currentUser.role.toUpperCase()}]
+            </div>
+            <button className="btn" onClick={fetchProducts}><RefreshCcw size={16} /> Sync DB</button>
           </div>
         </div>
 
         {/* DASHBOARD */}
         {activeTab === 'dashboard' && (<>
           <div className="stats-row">
-            <div className="stat-card"><div className="stat-icon purple"><Package size={20} /></div><div className="stat-value">{products.length}</div><div className="stat-label">Total Productos</div></div>
-            <div className="stat-card"><div className="stat-icon green"><TrendingUp size={20} /></div><div className="stat-value">{totalStock}</div><div className="stat-label">Stock Total</div></div>
-            <div className="stat-card"><div className="stat-icon amber"><CheckCircle2 size={20} /></div><div className="stat-value">{healthyCount}</div><div className="stat-label">Stock Saludable</div></div>
-            <div className="stat-card"><div className="stat-icon red"><AlertTriangle size={20} /></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Stock Crítico</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap primary"><Package size={22}/></div></div><div className="stat-value text-gradient">{products.length}</div><div className="stat-label">Total Items</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap success"><TrendingUp size={22}/></div></div><div className="stat-value">{totalStock}</div><div className="stat-label">Global Stock</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap purple"><CheckCircle2 size={22}/></div></div><div className="stat-value">{healthyCount}</div><div className="stat-label">Healthy Units</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap danger"><AlertTriangle size={22}/></div></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Critical Stock</div></div>
           </div>
-          <div className="dashboard-grid">
-            <div className="glass-card">
-              <div className="card-header"><span className="card-title">Distribución de Stock</span></div>
-              <div className="card-body">
-                <div className="chart-bars">
-                  {products.map((p, i) => { const mx = Math.max(...products.map(x => x.quantity), 1); return (
-                    <div key={p.id} className="chart-bar"><div className="chart-bar-value">{p.quantity}</div><div className="chart-bar-fill" style={{ height: `${(p.quantity / mx) * 100}%`, animationDelay: `${i * 0.15}s`, background: p.quantity <= 2 ? 'linear-gradient(180deg, #ef4444, rgba(239,68,68,0.4))' : 'linear-gradient(180deg, #6366f1, rgba(99,102,241,0.4))' }} /><div className="chart-bar-label">{p.name}</div></div>
-                  )})}
-                </div>
-              </div>
-            </div>
-            <div className="glass-card">
-              <div className="card-header"><span className="card-title">Actividad Reciente</span><span style={{ fontSize: '0.68rem', color: '#475569' }}>{logs.length} eventos</span></div>
-              <div className="card-body" style={{ maxHeight: '420px', overflowY: 'auto' }}>
-                {logs.length === 0 ? <div className="log-empty"><Activity size={32} color="#1e293b" style={{ marginBottom: '0.75rem' }} /><p>Sin actividad</p></div>
-                : logs.map((log, i) => <div key={log.id} className="log-item" style={{ animationDelay: `${i * 0.05}s` }}>{getLogIcon(log.type)}<span>{log.msg}</span><span className="log-time">{log.time}</span></div>)}
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+            <div className="cyber-card">
+              <div className="card-header"><span className="card-title"><Activity size={16}/> Neural Network Logs</span><span style={{color:'var(--accent-cyan)'}}>{logs.length} Events</span></div>
+              <div className="card-body" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                {logs.length === 0 ? <div className="empty-state"><Activity size={32} className="empty-icon"/><p>Waiting for neural signals...</p></div> : 
+                 logs.map((log, i) => <div key={log.id} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px', background:'rgba(255,255,255,0.02)', borderLeft:`2px solid ${log.type==='in'?'#00ff88':'#ff0055'}`, marginBottom:'8px', borderRadius:'6px'}}>
+                    <span style={{fontSize:'0.9rem', color:'#fff'}}>{log.msg}</span>
+                    <span style={{fontSize:'0.75rem', color:'var(--text-muted)'}}>{log.time}</span>
+                 </div>)}
               </div>
             </div>
           </div>
         </>)}
 
-        {/* CAMARA IA */}
+        {/* CÁMARA HUD */}
         {activeTab === 'camera' && (
-            <div className="glass-card" style={{ animation: 'fadeInUp 0.5s ease', maxWidth: '1000px', margin: '0 auto' }}>
-              <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="card-title">Transmisión de Cámara IA</span>
-                  <button onClick={toggleAI} className={`btn ${isAiActive ? 'btn-danger' : 'btn-primary'}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: isAiActive ? '#ef4444' : '#6366f1', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-                      <span style={{ display: isAiActive ? 'flex' : 'none', alignItems: 'center' }}><Square size={16} /></span>
-                      <span style={{ display: !isAiActive ? 'flex' : 'none', alignItems: 'center' }}><Play size={16} /></span>
-                      <span>{isAiActive ? 'Detener Análisis' : 'Iniciar Análisis IA'}</span>
-                  </button>
+          <div className="cyber-card camera-container" style={{ animation: 'fadeInUp 0.5s ease' }}>
+            <div className="card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <span className="card-title"><Crosshair size={18} color="var(--accent-cyan)" /> Neural Vision Array</span>
+              <button onClick={toggleAI} className={`btn ${isAiActive ? 'btn-danger' : 'btn-primary'}`}>
+                {isAiActive ? <><Square size={16}/> DISCONNECT</> : <><Play size={16}/> INITIALIZE AI</>}
+              </button>
+            </div>
+            
+            <div className="card-body camera-hud">
+              <div className="video-wrapper hud-corners">
+                <video ref={videoRef} autoPlay playsInline muted />
+                {isAiActive && <div className="laser-beam" />}
+                <div className={`live-badge ${isAiActive ? 'processing' : 'idle'}`}>
+                  <span className="dot" /> {isAiActive ? 'ANALYZING LIVE FEED' : 'STANDBY MODE'}
+                </div>
               </div>
-              <div className="card-body" style={{ display: 'flex', gap: '20px', flexDirection: window.innerWidth < 768 ? 'column' : 'row' }}>
-                  <div className="stream-container" style={{ height: '480px', flex: 2, position: 'relative' }}>
-                      <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
-                          <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }} />
-                      </div>
-                      <div className="scan-line" style={{ display: isAiActive ? 'block' : 'none' }} />
-                      <div className="stream-overlay" />
-                      <div className={`stream-badge ${isAiActive ? 'ai-active' : ''}`} style={{ background: isAiActive ? 'rgba(16, 185, 129, 0.9)' : 'rgba(71, 85, 105, 0.9)' }}>
-                          <span className="dot" style={{ background: isAiActive ? '#fff' : '#94a3b8' }} /><span>{isAiActive ? 'PROCESANDO' : 'EN ESPERA'}</span>
-                      </div>
-                      <div className="ai-status"><ScanFace size={14} />Visión IA</div>
+              
+              <div className="detection-list">
+                <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Eye size={16} /> Targets Acquired
+                </h4>
+                
+                {!isAiActive ? (
+                  <div className="empty-state">
+                    <EyeOff size={40} className="empty-icon" />
+                    <p>Vision system offline.<br/>Initialize to scan area.</p>
                   </div>
-                  
-                  {/* REAL-TIME DETECTION PANEL */}
-                  <div className="detection-panel" style={{ flex: 1, background: 'rgba(15, 23, 42, 0.5)', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column' }}>
-                      <h4 style={{ margin: '0 0 1rem 0', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
-                          <ScanFace size={20} color={isAiActive ? "#10b981" : "#64748b"}/> Objetos en Vista
-                      </h4>
-                      
-                      {!isAiActive ? (
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', textAlign: 'center' }}>
-                              <EyeOff size={32} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-                              <p style={{ fontSize: '0.9rem' }}>La IA está apagada.<br/>Presiona el botón superior para iniciar el escaneo en tiempo real.</p>
-                          </div>
-                      ) : Object.keys(shelfState).length === 0 ? (
-                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', textAlign: 'center' }}>
-                              <div className="spinner-border" style={{ marginBottom: '1rem', borderTopColor: '#10b981', width: '30px', height: '30px', border: '3px solid rgba(16,185,129,0.2)', borderTop: '3px solid #10b981', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-                              <p style={{ fontSize: '0.9rem' }}>Buscando productos en la cámara...</p>
-                          </div>
-                      ) : (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: 1, paddingRight: '5px' }}>
-                              {Object.entries(shelfState).map(([name, count], idx) => (
-                                  <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '10px', animation: `fadeInUp 0.3s ease ${idx * 0.05}s forwards` }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                          <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
-                                            <img src={SMART_MAPPING[name]?.img || '/products/atun.png'} alt={name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                                          </div>
-                                          <span style={{ color: '#f1f5f9', fontSize: '0.95rem', fontWeight: 500 }}>{name}</span>
-                                      </div>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Cant:</span>
-                                          <span style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '0.9rem', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(16,185,129,0.3)' }}>{count}</span>
-                                      </div>
-                                  </div>
-                              ))}
-                          </div>
-                      )}
+                ) : Object.keys(shelfState).length === 0 ? (
+                  <div className="empty-state">
+                    <div className="spinner-cyber" />
+                    <p>Scanning sectors...</p>
                   </div>
+                ) : (
+                  Object.entries(shelfState).map(([name, count], idx) => (
+                    <div key={name} className="detected-item" style={{ animationDelay: `${idx * 0.1}s` }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className="detected-img-wrap">
+                           <img src={SMART_MAPPING[name]?.img || '/products/atun.png'} alt={name} />
+                        </div>
+                        <span className="detected-name">{name}</span>
+                      </div>
+                      <span className="detected-qty">{count}</span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
+          </div>
         )}
 
         {/* INVENTORY */}
         {activeTab === 'inventory' && (
           <div style={{ animation: 'fadeInUp 0.5s ease' }}>
-            <div className="users-header" style={{ marginBottom: '1rem' }}>
-              <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{products.length} productos en inventario</span>
-              {isAdmin && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16} />{showAddProduct ? 'Cancelar' : 'Agregar Producto'}</button>}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+              {isAdmin && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/> {showAddProduct ? 'Cancel' : 'Register Item'}</button>}
             </div>
 
             {showAddProduct && (
-              <div className="add-user-form">
-                <h3><PackagePlus size={16} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />Nuevo Producto</h3>
-                <form onSubmit={handleAddProduct}>
-                  <div className="form-row">
-                    <div className="form-group"><label className="form-label">Nombre del Producto</label><input className="form-input" placeholder="Ej: Atún" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} required /></div>
-                    <div className="form-group"><label className="form-label">Ubicación (Pasillo)</label><input className="form-input" placeholder="Ej: Pasillo 1" value={newProduct.aisle} onChange={e => setNewProduct({ ...newProduct, aisle: e.target.value })} required /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label className="form-label">Cantidad Inicial</label><input className="form-input" type="number" min="0" value={newProduct.quantity} onChange={e => setNewProduct({ ...newProduct, quantity: parseInt(e.target.value) || 0 })} required /></div>
-                  </div>
-                  <button type="submit" className="login-btn" style={{ width: 'auto', padding: '0.6rem 1.5rem', marginTop: '0' }}>Guardar Producto</button>
-                </form>
+              <div className="cyber-card" style={{ marginBottom: '1.5rem' }}>
+                <div className="card-header"><span className="card-title text-gradient">Register New Protocol</span></div>
+                <div className="card-body">
+                  <form onSubmit={handleAddProduct} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '1rem', alignItems: 'end' }}>
+                    <div><label className="form-label">Item Name</label><input className="form-input" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required/></div>
+                    <div><label className="form-label">Sector</label><input className="form-input" value={newProduct.aisle} onChange={e => setNewProduct({...newProduct, aisle: e.target.value})} required/></div>
+                    <div><label className="form-label">Initial Qty</label><input className="form-input" type="number" value={newProduct.quantity} onChange={e => setNewProduct({...newProduct, quantity: parseInt(e.target.value)||0})} required/></div>
+                    <button type="submit" className="btn btn-primary" style={{ padding: '12px 24px' }}>SAVE</button>
+                  </form>
+                </div>
               </div>
             )}
 
-            <div className="glass-card">
-              <div className="card-header"><span className="card-title">Inventario de Productos</span></div>
-            <div className="card-body">
-              <div className="table-header"><span>Producto</span><span>Ubicación</span><span>Cantidad</span><span>Estado</span>{isAdmin && <span>Acciones</span>}</div>
-              <div className="inventory-grid">
-                {products.map((p, i) => (
-                  <div key={p.id} className="product-row" style={{ animationDelay: `${i * 0.08}s` }}>
-                    <div className="product-info"><img src={SMART_MAPPING[p.name]?.img || '/products/atun.png'} alt={p.name} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">SKU-{String(p.id).slice(-4).padStart(4, '0')}</div></div></div>
-                    <div className="product-location">{p.aisle || 'General'}</div>
-                    <div className="product-qty">{p.quantity}<span>unidades</span></div>
-                    <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot" />{p.quantity > 2 ? 'Saludable' : 'Poco Stock'}</span></div>
-                    {isAdmin && (
-                      <div className="product-actions">
-                        <button className="delete-btn-table" onClick={() => handleDeleteProduct(p.id)} title="Eliminar Producto">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          </div>
-        )}
-
-        {/* REPORTS */}
-        {activeTab === 'reports' && (
-          <div style={{ animation: 'fadeInUp 0.5s ease' }}>
-              <div className="glass-card">
-                  <div className="card-header"><span className="card-title">Historial de Sesiones de Monitoreo</span></div>
-                  <div className="card-body">
-                      {sessions.length === 0 ? (
-                          <div className="log-empty" style={{ padding: '3rem' }}>
-                              <ClipboardList size={48} color="#1e293b" style={{ marginBottom: '1rem' }} />
-                              <p>No hay sesiones registradas.</p>
-                              <span style={{ fontSize: '0.8rem' }}>Inicia el análisis IA desde la pestaña de Cámara para registrar una sesión.</span>
-                          </div>
-                      ) : (
-                          <div className="inventory-grid">
-                              {sessions.map((s, i) => (
-                                  <div key={s.id} className="glass-card" style={{ marginBottom: '1rem', padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1rem' }}>
-                                          <div>
-                                              <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#f1f5f9' }}>Sesión #{String(s.id).slice(-4)}</div>
-                                              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Eventos detectados: {s.events.length}</div>
-                                          </div>
-                                          <div style={{ textAlign: 'right' }}>
-                                              <div style={{ fontSize: '0.85rem', color: '#10b981' }}>Inicio: {s.startTime}</div>
-                                              <div style={{ fontSize: '0.85rem', color: '#ef4444' }}>Fin: {s.endTime || 'En progreso'}</div>
-                                          </div>
-                                      </div>
-                                      <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
-                                          {s.events.slice(0, 5).map(ev => (
-                                              <div key={ev.id} style={{ display: 'flex', gap: '10px', fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '0.5rem' }}>
-                                                  <span>{ev.time}</span> - <span>{ev.msg}</span>
-                                              </div>
-                                          ))}
-                                          {s.events.length > 5 && <div style={{ fontSize: '0.8rem', color: '#6366f1' }}>+ {s.events.length - 5} eventos más...</div>}
-                                      </div>
-                                  </div>
-                              ))}
-                          </div>
-                      )}
-                  </div>
-              </div>
-          </div>
-        )}
-
-        {/* USERS MANAGEMENT (solo admin) */}
-        {activeTab === 'users' && isAdmin && (
-          <div style={{ animation: 'fadeInUp 0.5s ease' }}>
-            <div className="users-header">
-              <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{users.length} usuarios registrados en {currentUser.supermercado || 'Sede Principal'}</span>
-              <button className="btn btn-primary" onClick={() => setShowAddUser(!showAddUser)}><UserPlus size={16} />{showAddUser ? 'Cancelar' : 'Agregar Usuario'}</button>
-            </div>
-
-            {showAddUser && (
-              <div className="add-user-form">
-                <h3><UserPlus size={16} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />Nuevo Usuario</h3>
-                <form onSubmit={handleAddUser}>
-                  <div className="form-row">
-                    <div className="form-group"><label className="form-label">Nombre completo</label><input className="form-input" placeholder="Ej: Juan Pérez" value={newUser.name} onChange={e => setNewUser({ ...newUser, name: e.target.value })} required /></div>
-                    <div className="form-group"><label className="form-label">Usuario</label><input className="form-input" placeholder="Ej: juanp" value={newUser.username} onChange={e => setNewUser({ ...newUser, username: e.target.value })} required /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label className="form-label">Contraseña</label><input className="form-input" type="password" placeholder="••••••••" value={newUser.password} onChange={e => setNewUser({ ...newUser, password: e.target.value })} required /></div>
-                    <div className="form-group"><label className="form-label">Supermercado (SaaS)</label><input className="form-input" placeholder="Ej: Ã‰xito Norte" value={newUser.supermercado} onChange={e => setNewUser({ ...newUser, supermercado: e.target.value })} required /></div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group"><label className="form-label">Rol</label>
-                      <select className="form-input" value={newUser.role} onChange={e => setNewUser({ ...newUser, role: e.target.value })}>
-                        <option value="user">Cajero / Operador</option><option value="admin">Administrador</option>
-                      </select>
-                    </div>
-                  </div>
-                  <button type="submit" className="login-btn" style={{ marginTop: '0.5rem' }}><UserPlus size={16} />Crear Usuario</button>
-                </form>
-              </div>
-            )}
-
-            <div className="glass-card">
-              <div className="card-header"><span className="card-title">Usuarios del Sistema</span></div>
+            <div className="cyber-card">
+              <div className="card-header"><span className="card-title">Database Core</span></div>
               <div className="card-body">
-                <div className="user-table-header"><span>Usuario</span><span>Supermercado</span><span>Fecha de Creación</span><span>Rol</span><span></span></div>
+                <div className="table-header"><span>Asset</span><span>Sector</span><span>Quantity</span><span>Status</span>{isAdmin && <span>Override</span>}</div>
                 <div className="inventory-grid">
-                  {users.map((u, i) => (
-                    <div key={u.id} className="user-row" style={{ animationDelay: `${i * 0.08}s` }}>
-                      <div className="user-info">
-                        <div className={`user-avatar ${u.role === 'admin' ? 'admin-avatar' : 'user-avatar-style'}`}>{u.name.charAt(0)}</div>
-                        <div><div className="user-name">{u.name}</div><div className="user-username">@{u.username}</div></div>
-                      </div>
-                      <div style={{ fontSize: '0.85rem', color: '#f1f5f9' }}><Store size={12} style={{marginRight:'4px'}}/>{u.supermercado || 'Sede Principal'}</div>
-                      <div style={{ fontSize: '0.82rem', color: '#94a3b8' }}>{new Date(u.createdAt).toLocaleDateString('es-CO')}</div>
-                      <div><span className={`role-badge ${u.role}`}><Shield size={10} />{u.role === 'admin' ? 'Admin' : 'Operador'}</span></div>
-                      <div>{u.role !== 'admin' && <button className="delete-btn" onClick={() => handleDeleteUser(u.id)} title="Eliminar"><Trash2 size={14} /></button>}</div>
+                  {products.map((p, i) => (
+                    <div key={p.id} className="product-row" style={{ animationDelay: `${i * 0.05}s` }}>
+                      <div className="product-info"><img src={SMART_MAPPING[p.name]?.img || '/products/atun.png'} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">ID: {p.id.slice(-6).toUpperCase()}</div></div></div>
+                      <div style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
+                      <div className="product-qty">{p.quantity}<span>u</span></div>
+                      <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot"/>{p.quantity > 2 ? 'OPTIMAL' : 'CRITICAL'}</span></div>
+                      {isAdmin && <div><button onClick={() => handleDeleteProduct(p.id)} className="btn" style={{ padding: '6px', color:'#ff0055', borderColor:'rgba(255,0,85,0.3)' }}><Trash2 size={16} /></button></div>}
                     </div>
                   ))}
                 </div>
@@ -568,16 +385,8 @@ function Dashboard({ currentUser, onLogout }) {
   )
 }
 
-// --------------------------------------
-// APP ROOT (Auth Router)
-// --------------------------------------
 export default function App() {
   const [currentUser, setCurrentUser] = useState(getSession())
-
-  const handleLogin = (user) => setCurrentUser(user)
-  const handleLogout = () => { clearSession(); setCurrentUser(null); toast.success('Sesión cerrada') }
-
-  if (!currentUser) return <LoginScreen onLogin={handleLogin} />
-  return <Dashboard currentUser={currentUser} onLogout={handleLogout} />
+  if (!currentUser) return <LoginScreen onLogin={u => setCurrentUser(u)} />
+  return <Dashboard currentUser={currentUser} onLogout={() => { clearSession(); setCurrentUser(null); toast.success('Disconnected') }} />
 }
-
