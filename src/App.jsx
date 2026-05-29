@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import {
-  ScanFace, Package, Loader2, RefreshCcw, LayoutDashboard,
+  ScanFace, Package, PackagePlus, Loader2, RefreshCcw, LayoutDashboard,
   ClipboardList, Bell, Settings, BarChart3, CheckCircle2, AlertCircle, Info,
   Volume2, VolumeX, Printer, Zap, TrendingUp, AlertTriangle, Activity, Eye, EyeOff,
   Users, LogOut, Trash2, UserPlus, Shield, Lock, Store, Play, Square, Video
@@ -100,6 +100,10 @@ function Dashboard({ currentUser, onLogout }) {
   const [isAiActive, setIsAiActive] = useState(false)
   const [sessions, setSessions] = useState(JSON.parse(localStorage.getItem('ucc_sessions') || '[]'))
   const currentSession = useRef(null)
+
+  // Products State
+  const [showAddProduct, setShowAddProduct] = useState(false)
+  const [newProduct, setNewProduct] = useState({ name: '', aisle: '', quantity: 10 })
 
   // Users State
   const [showAddUser, setShowAddUser] = useState(false)
@@ -213,7 +217,22 @@ function Dashboard({ currentUser, onLogout }) {
   const healthyCount = products.filter(p => p.quantity > 2).length
   const getLogIcon = (t) => t === 'in' ? <CheckCircle2 size={14} color="#10b981" /> : t === 'out' ? <AlertCircle size={14} color="#ef4444" /> : <Info size={14} color="#f59e0b" />
 
-  // â”€â”€ User management â”€â”€
+  // ── Product management ──
+  const handleAddProduct = async (e) => {
+    e.preventDefault()
+    if (!newProduct.name || !newProduct.aisle) { toast.error('Completa los campos obligatorios'); return }
+    try {
+      await axios.post(API_BASE, newProduct)
+      setNewProduct({ name: '', aisle: '', quantity: 10 })
+      setShowAddProduct(false)
+      toast.success(`Producto agregado`)
+      fetchProducts()
+    } catch(err) {
+      toast.error('Error al agregar el producto')
+    }
+  }
+
+  // ── User management ──
   const handleAddUser = async (e) => {
     e.preventDefault()
     if (!newUser.name || !newUser.username || !newUser.password || !newUser.supermercado) { toast.error('Completa todos los campos'); return }
@@ -359,8 +378,30 @@ function Dashboard({ currentUser, onLogout }) {
 
         {/* INVENTORY */}
         {activeTab === 'inventory' && (
-          <div className="glass-card" style={{ animation: 'fadeInUp 0.5s ease' }}>
-            <div className="card-header"><span className="card-title">Inventario de Productos</span><span style={{ fontSize: '0.72rem', color: '#475569' }}>{products.length} items</span></div>
+          <div style={{ animation: 'fadeInUp 0.5s ease' }}>
+            <div className="users-header" style={{ marginBottom: '1rem' }}>
+              <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{products.length} productos en inventario</span>
+              {isAdmin && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16} />{showAddProduct ? 'Cancelar' : 'Agregar Producto'}</button>}
+            </div>
+
+            {showAddProduct && (
+              <div className="add-user-form">
+                <h3><PackagePlus size={16} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />Nuevo Producto</h3>
+                <form onSubmit={handleAddProduct}>
+                  <div className="form-row">
+                    <div className="form-group"><label className="form-label">Nombre del Producto</label><input className="form-input" placeholder="Ej: Atún" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} required /></div>
+                    <div className="form-group"><label className="form-label">Ubicación (Pasillo)</label><input className="form-input" placeholder="Ej: Pasillo 1" value={newProduct.aisle} onChange={e => setNewProduct({ ...newProduct, aisle: e.target.value })} required /></div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group"><label className="form-label">Cantidad Inicial</label><input className="form-input" type="number" min="0" value={newProduct.quantity} onChange={e => setNewProduct({ ...newProduct, quantity: parseInt(e.target.value) || 0 })} required /></div>
+                  </div>
+                  <button type="submit" className="login-btn" style={{ width: 'auto', padding: '0.6rem 1.5rem', marginTop: '0' }}>Guardar Producto</button>
+                </form>
+              </div>
+            )}
+
+            <div className="glass-card">
+              <div className="card-header"><span className="card-title">Inventario de Productos</span></div>
             <div className="card-body">
               <div className="table-header"><span>Producto</span><span>Ubicación</span><span>Cantidad</span><span>Estado</span>{isAdmin && <span>Acciones</span>}</div>
               <div className="inventory-grid">
@@ -381,6 +422,7 @@ function Dashboard({ currentUser, onLogout }) {
                 ))}
               </div>
             </div>
+          </div>
           </div>
         )}
 
