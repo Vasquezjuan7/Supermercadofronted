@@ -486,7 +486,7 @@ body::before {
 /* ── Inventario Table ──────────────────────────────── */
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 0.5fr;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr;
   padding: 0 1.5rem 1rem;
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -496,10 +496,11 @@ body::before {
   border-bottom: 1px solid var(--border-glass);
   margin-bottom: 1rem;
 }
+.table-header.with-delete { grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr auto; }
 .inventory-grid { display: grid; gap: 0.5rem; }
 .product-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 0.5fr;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr;
   align-items: center;
   padding: 1rem 1.5rem;
   background: rgba(255,255,255,0.02);
@@ -508,6 +509,7 @@ body::before {
   transition: var(--transition-fast);
   animation: fadeInUp 0.4s backwards;
 }
+.product-row.with-delete { grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr auto; }
 .product-row:hover {
   background: rgba(255,255,255,0.05);
   border-color: rgba(255,255,255,0.1);
@@ -625,3 +627,135 @@ body::before {
   transition: var(--transition-fast);
 }
 .login-btn:hover { box-shadow: 0 10px 30px rgba(0,240,255,0.5); transform: translateY(-2px); }
+
+/* ── Generic Layouts ───────────────────────────────── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.product-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+/* ── Responsiveness (Mobile & Tablets) ─────────────── */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  
+  /* Sidebar becomes Bottom Nav */
+  .sidebar {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    border-radius: 20px 20px 0 0;
+    z-index: 1000;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05);
+  }
+  
+  .sidebar-logo-container {
+    display: none;
+  }
+  
+  .sidebar-bottom {
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+  }
+  
+  .nav-item {
+    width: auto;
+    height: 100%;
+    padding: 10px;
+    justify-content: center;
+  }
+  
+  .nav-label {
+    display: none;
+  }
+  
+  .nav-item.active::after {
+    display: none;
+  }
+  
+  .nav-item.active {
+    box-shadow: none;
+    background: transparent;
+  }
+  .nav-item.active svg {
+    color: var(--accent-cyan);
+    filter: drop-shadow(0 0 5px var(--accent-cyan));
+  }
+  
+  /* Main content adjusts to bottom nav */
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem 1rem 90px 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .product-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Simplify tables on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  .table-header {
+    grid-template-columns: 2fr 1fr 1fr !important;
+    padding: 0 0.5rem 0.5rem;
+  }
+  .table-header.with-delete {
+    grid-template-columns: 2fr 1fr 1fr auto !important;
+  }
+  
+  .product-row {
+    grid-template-columns: 2fr 1fr 1fr !important;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+  .product-row.with-delete {
+    grid-template-columns: 2fr 1fr 1fr auto !important;
+  }
+  
+  .product-info { gap: 0.5rem; }
+  .product-img { width: 40px; height: 40px; }
+  .product-name { font-size: 0.85rem; }
+  .product-qty { font-size: 1rem; }
+}

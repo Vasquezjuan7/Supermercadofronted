@@ -373,7 +373,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
             <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap danger"><AlertTriangle size={22}/></div></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Critical Stock</div></div>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
+          <div className="dashboard-grid">
             {/* ANALYTICS CHART */}
             <div className="cyber-card">
               <div className="card-header"><span className="card-title"><Activity size={16}/><span>Stock Analytics</span></span></div>
@@ -475,7 +475,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
               <div className="cyber-card" style={{ marginBottom: '1.5rem' }}>
                 <div className="card-header"><span className="card-title text-gradient">Register New Protocol</span></div>
                 <div className="card-body">
-                  <form onSubmit={handleAddProduct} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '1rem', alignItems: 'end' }}>
+                  <form className="product-form-grid" onSubmit={handleAddProduct}>
                     <div><label className="form-label">Item Name</label><input className="form-input" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required/></div>
                     <div><label className="form-label">Sector</label><input className="form-input" value={newProduct.aisle} onChange={e => setNewProduct({...newProduct, aisle: e.target.value})} required/></div>
                     <div><label className="form-label">Price (COP)</label><input className="form-input" type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: parseFloat(e.target.value)||0})} required/></div>
@@ -489,19 +489,19 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
             <div className="cyber-card">
               <div className="card-header"><span className="card-title">Database Core</span></div>
               <div className="card-body">
-                <div className="table-header" style={{ gridTemplateColumns: '2fr 1fr 1fr 1.5fr 1fr auto' }}><span>Asset</span><span>Sector</span><span>Price</span><span>Quantity</span><span>Status</span>{can('delete_product') && <span>Override</span>}</div>
+                <div className={`table-header ${can('delete_product') ? 'with-delete' : ''}`}><span>Asset</span><span className="hide-mobile">Sector</span><span>Price</span><span>Quantity</span><span className="hide-mobile">Status</span>{can('delete_product') && <span>Override</span>}</div>
                 <div className="inventory-grid">
                   {products.map((p, i) => (
-                    <div key={p.id} className="product-row" style={{ gridTemplateColumns: '2fr 1fr 1fr 1.5fr 1fr auto', animationDelay: `${i * 0.05}s` }}>
+                    <div key={p.id} className={`product-row ${can('delete_product') ? 'with-delete' : ''}`} style={{ animationDelay: `${i * 0.05}s` }}>
                       <div className="product-info"><img src={(SMART_MAPPING as any)[p.name]?.img || '/products/atun.png'} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">ID: {p.id.slice(-6).toUpperCase()}</div></div></div>
-                      <div style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
+                      <div className="hide-mobile" style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
                       <div style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{formatCOP(p.price || 0)}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {can('edit_inventory') && <button className="btn" style={{ padding: '4px', minWidth: 'auto', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => updateQuantity(p.id, p.quantity - 1)}><Minus size={14}/></button>}
                         <div className="product-qty" style={{ width: '40px', justifyContent: 'center' }}>{p.quantity}</div>
                         {can('edit_inventory') && <button className="btn" style={{ padding: '4px', minWidth: 'auto', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => updateQuantity(p.id, p.quantity + 1)}><Plus size={14}/></button>}
                       </div>
-                      <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot"></span><span>{p.quantity > 2 ? 'OPTIMAL' : 'CRITICAL'}</span></span></div>
+                      <div className="hide-mobile"><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot"></span><span>{p.quantity > 2 ? 'OPTIMAL' : 'CRITICAL'}</span></span></div>
                       {can('delete_product') && <div><button onClick={() => handleDeleteProduct(p.id)} className="btn" style={{ padding: '6px', color:'#ff0055', borderColor:'rgba(255,0,85,0.3)' }}><Trash2 size={16} /></button></div>}
                     </div>
                   ))}
