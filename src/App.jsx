@@ -3,8 +3,9 @@ import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import {
   ScanFace, Package, PackagePlus, RefreshCcw, LayoutDashboard,
-  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair
+  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus
 } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import './App.css'
 
 const API_BASE = '/proxy/backend/api/products'
@@ -106,7 +107,7 @@ function Dashboard({ currentUser, onLogout }) {
   const currentSession = useRef(null)
 
   const [showAddProduct, setShowAddProduct] = useState(false)
-  const [newProduct, setNewProduct] = useState({ name: '', aisle: '', quantity: 10 })
+  const [newProduct, setNewProduct] = useState({ name: '', aisle: '', quantity: 10, price: 0 })
 
   const [showAddUser, setShowAddUser] = useState(false)
   const [users, setUsers] = useState([])
@@ -238,15 +239,37 @@ function Dashboard({ currentUser, onLogout }) {
   const alerts = products.filter(p => p.quantity <= 2)
   const totalStock = products.reduce((s, p) => s + (p.quantity || 0), 0)
   const healthyCount = products.filter(p => p.quantity > 2).length
+  const totalValue = products.reduce((s, p) => s + ((p.quantity || 0) * (p.price || 0)), 0)
+  const formatCOP = (value) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value)
 
   const handleAddProduct = async (e) => {
     e.preventDefault()
     if (!newProduct.name || !newProduct.aisle) return toast.error('Faltan campos')
-    try { await axios.post(API_BASE, newProduct); setNewProduct({ name: '', aisle: '', quantity: 10 }); setShowAddProduct(false); toast.success('Producto agregado'); fetchProducts() } catch(err) { toast.error('Error al agregar') }
+    try { await axios.post(API_BASE, newProduct); setNewProduct({ name: '', aisle: '', quantity: 10, price: 0 }); setShowAddProduct(false); toast.success('Producto agregado'); fetchProducts() } catch(err) { toast.error('Error al agregar') }
   }
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('¿Eliminar producto?')) return
     try { await axios.delete(`${API_BASE}/${id}`); toast.success('Eliminado'); fetchProducts() } catch (e) { toast.error('Error') }
+  }
+
+  const updateQuantity = async (id, newQty) => {
+    if (newQty < 0) return
+    try { await axios.put(`${API_BASE}/${id}/stock`, null, { params: { quantity: newQty } }); fetchProducts() }
+    catch (e) { toast.error('Error al actualizar stock') }
+  }
+
+  const exportToCSV = () => {
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + "ID,Name,Sector,Quantity,Price (COP),Total Value (COP)\n"
+      + products.map(e => `${e.id},${e.name},${e.aisle},${e.quantity},${e.price||0},${(e.quantity||0)*(e.price||0)}`).join("\n")
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", `inventory_export_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('Datos exportados correctamente')
   }
 
   const navItems = [
@@ -305,11 +328,32 @@ function Dashboard({ currentUser, onLogout }) {
           <div className="stats-row">
             <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap primary"><Package size={22}/></div></div><div className="stat-value text-gradient">{products.length}</div><div className="stat-label">Total Items</div></div>
             <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap success"><TrendingUp size={22}/></div></div><div className="stat-value">{totalStock}</div><div className="stat-label">Global Stock</div></div>
-            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap purple"><CheckCircle2 size={22}/></div></div><div className="stat-value">{healthyCount}</div><div className="stat-label">Healthy Units</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap" style={{ color: '#00f0ff', background: 'rgba(0,240,255,0.1)' }}><DollarSign size={22}/></div></div><div className="stat-value" style={{ fontSize: '1.4rem' }}>{formatCOP(totalValue)}</div><div className="stat-label">Inventory Value</div></div>
             <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap danger"><AlertTriangle size={22}/></div></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Critical Stock</div></div>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
+            {/* ANALYTICS CHART */}
+            <div className="cyber-card">
+              <div className="card-header"><span className="card-title"><Activity size={16}/><span>Stock Analytics</span></span></div>
+              <div className="card-body" style={{ height: '300px', paddingTop: '1rem' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={products}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: 'rgba(10,10,15,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }} />
+                    <Bar dataKey="quantity" radius={[4, 4, 0, 0]}>
+                      {products.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.quantity <= 2 ? '#ff0055' : entry.quantity < 10 ? '#ffaa00' : '#00f0ff'} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* NEURAL LOGS */}
             <div className="cyber-card">
               <div className="card-header"><span className="card-title"><Activity size={16}/><span>Neural Network Logs</span></span><span style={{color:'var(--accent-cyan)'}}>{logs.length} Events</span></div>
               <div className="card-body" style={{ maxHeight: '300px', overflowY: 'auto' }}>
@@ -381,7 +425,8 @@ function Dashboard({ currentUser, onLogout }) {
         {/* INVENTORY */}
         {activeTab === 'inventory' && (
           <div style={{ animation: 'fadeInUp 0.5s ease' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '1.5rem' }}>
+              <button className="btn" onClick={exportToCSV}><Download size={16}/><span>Export Data</span></button>
               {can('edit_inventory') && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/><span>{showAddProduct ? 'Cancel' : 'Register Item'}</span></button>}
             </div>
 
@@ -389,9 +434,10 @@ function Dashboard({ currentUser, onLogout }) {
               <div className="cyber-card" style={{ marginBottom: '1.5rem' }}>
                 <div className="card-header"><span className="card-title text-gradient">Register New Protocol</span></div>
                 <div className="card-body">
-                  <form onSubmit={handleAddProduct} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '1rem', alignItems: 'end' }}>
+                  <form onSubmit={handleAddProduct} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '1rem', alignItems: 'end' }}>
                     <div><label className="form-label">Item Name</label><input className="form-input" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required/></div>
                     <div><label className="form-label">Sector</label><input className="form-input" value={newProduct.aisle} onChange={e => setNewProduct({...newProduct, aisle: e.target.value})} required/></div>
+                    <div><label className="form-label">Price (COP)</label><input className="form-input" type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: parseFloat(e.target.value)||0})} required/></div>
                     <div><label className="form-label">Initial Qty</label><input className="form-input" type="number" value={newProduct.quantity} onChange={e => setNewProduct({...newProduct, quantity: parseInt(e.target.value)||0})} required/></div>
                     <button type="submit" className="btn btn-primary" style={{ padding: '12px 24px' }}>SAVE</button>
                   </form>
@@ -402,13 +448,18 @@ function Dashboard({ currentUser, onLogout }) {
             <div className="cyber-card">
               <div className="card-header"><span className="card-title">Database Core</span></div>
               <div className="card-body">
-                <div className="table-header"><span>Asset</span><span>Sector</span><span>Quantity</span><span>Status</span>{can('delete_product') && <span>Override</span>}</div>
+                <div className="table-header" style={{ gridTemplateColumns: '2fr 1fr 1fr 1.5fr 1fr auto' }}><span>Asset</span><span>Sector</span><span>Price</span><span>Quantity</span><span>Status</span>{can('delete_product') && <span>Override</span>}</div>
                 <div className="inventory-grid">
                   {products.map((p, i) => (
-                    <div key={p.id} className="product-row" style={{ animationDelay: `${i * 0.05}s` }}>
+                    <div key={p.id} className="product-row" style={{ gridTemplateColumns: '2fr 1fr 1fr 1.5fr 1fr auto', animationDelay: `${i * 0.05}s` }}>
                       <div className="product-info"><img src={SMART_MAPPING[p.name]?.img || '/products/atun.png'} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">ID: {p.id.slice(-6).toUpperCase()}</div></div></div>
                       <div style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
-                      <div className="product-qty">{p.quantity}<span>u</span></div>
+                      <div style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{formatCOP(p.price || 0)}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {can('edit_inventory') && <button className="btn" style={{ padding: '4px', minWidth: 'auto', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => updateQuantity(p.id, p.quantity - 1)}><Minus size={14}/></button>}
+                        <div className="product-qty" style={{ width: '40px', justifyContent: 'center' }}>{p.quantity}</div>
+                        {can('edit_inventory') && <button className="btn" style={{ padding: '4px', minWidth: 'auto', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => updateQuantity(p.id, p.quantity + 1)}><Plus size={14}/></button>}
+                      </div>
                       <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot"></span><span>{p.quantity > 2 ? 'OPTIMAL' : 'CRITICAL'}</span></span></div>
                       {can('delete_product') && <div><button onClick={() => handleDeleteProduct(p.id)} className="btn" style={{ padding: '6px', color:'#ff0055', borderColor:'rgba(255,0,85,0.3)' }}><Trash2 size={16} /></button></div>}
                     </div>
