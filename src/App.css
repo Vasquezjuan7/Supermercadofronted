@@ -831,7 +831,7 @@ body::before {
     display: none;
   }
   .chat-sidebar h3 { display: none; }
-  .chat-sidebar > div[style] { display: none !important; } /* Hides inline styled labels */
+  .mobile-hide-label { display: none !important; }
   .chat-contact {
     white-space: nowrap;
     margin-bottom: 0;

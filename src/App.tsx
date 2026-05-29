@@ -798,7 +798,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                 Canal General
                 {unreadCounts['general'] > 0 && <span className="unread-dot"></span>}
               </div>
-              <div style={{ marginTop: '10px', padding: '10px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>USUARIOS</div>
+              <div className="mobile-hide-label" style={{ marginTop: '10px', padding: '10px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>USUARIOS</div>
               {users.filter(u => String(u.id) !== String(currentUser?.id)).map(u => (
                 <div key={u.id} className={`chat-contact ${chatTarget === String(u.id) ? 'active' : ''}`} onClick={() => setChatTarget(String(u.id))} style={{ position: 'relative' }}>
                   <Users size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }}/>
