@@ -404,17 +404,23 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                 <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <BarChart data={products} margin={{ top: 25, right: 20, left: -20, bottom: 65 }}>
                     <defs>
-                      <linearGradient id="colorHealthy" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#00f0ff" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#b026ff" stopOpacity={0.4}/>
+                      <linearGradient id="colorGrad0" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#00f0ff" stopOpacity={0.9}/><stop offset="95%" stopColor="#b026ff" stopOpacity={0.4}/>
                       </linearGradient>
-                      <linearGradient id="colorWarning" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ffaa00" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#ffaa00" stopOpacity={0.3}/>
+                      <linearGradient id="colorGrad1" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ff007f" stopOpacity={0.9}/><stop offset="95%" stopColor="#ff7700" stopOpacity={0.4}/>
                       </linearGradient>
-                      <linearGradient id="colorCritical" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ff0055" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#ff0055" stopOpacity={0.3}/>
+                      <linearGradient id="colorGrad2" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#00ff88" stopOpacity={0.9}/><stop offset="95%" stopColor="#0088ff" stopOpacity={0.4}/>
+                      </linearGradient>
+                      <linearGradient id="colorGrad3" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#b026ff" stopOpacity={0.9}/><stop offset="95%" stopColor="#ff0055" stopOpacity={0.4}/>
+                      </linearGradient>
+                      <linearGradient id="colorGrad4" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ffea00" stopOpacity={0.9}/><stop offset="95%" stopColor="#ff5500" stopOpacity={0.4}/>
+                      </linearGradient>
+                      <linearGradient id="colorGrad5" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#00b8ff" stopOpacity={0.9}/><stop offset="95%" stopColor="#00f0ff" stopOpacity={0.4}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -423,7 +429,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                     <Tooltip cursor={{ fill: 'rgba(0,240,255,0.05)' }} contentStyle={{ backgroundColor: 'rgba(10,10,15,0.95)', border: '1px solid rgba(0,240,255,0.2)', borderRadius: '8px', color: '#fff', boxShadow: '0 0 15px rgba(0,240,255,0.1)' }} />
                     <Bar dataKey="quantity" radius={[6, 6, 0, 0]} maxBarSize={50}>
                       {products.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.quantity <= 2 ? 'url(#colorCritical)' : entry.quantity < 10 ? 'url(#colorWarning)' : 'url(#colorHealthy)'} />
+                        <Cell key={`cell-${index}`} fill={`url(#colorGrad${index % 6})`} />
                       ))}
                       <LabelList dataKey="quantity" position="top" fill="#ffffff" fontSize={11} fontWeight={600} style={{ textShadow: '0 0 5px rgba(0,0,0,0.5)' }} />
                     </Bar>
