@@ -380,6 +380,110 @@ function Dashboard({ currentUser, onLogout }) {
           </div>
         )}
 
+        {/* REPORTS — Historial de Sesiones */}
+        {activeTab === 'reports' && (
+          <div style={{ animation: 'fadeInUp 0.5s ease' }}>
+            <div className="cyber-card">
+              <div className="card-header">
+                <span className="card-title"><Activity size={16}/><span>Session History</span></span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>{sessions.length} sesiones</span>
+              </div>
+              <div className="card-body">
+                {sessions.length === 0 ? (
+                  <div className="empty-state">
+                    <ClipboardList size={48} className="empty-icon" />
+                    <p style={{ marginBottom: '0.5rem' }}>No hay sesiones registradas.</p>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Inicia el análisis IA desde la pestaña de Cámara para registrar una sesión.</span>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gap: '1rem' }}>
+                    {sessions.map((s, i) => (
+                      <div key={s.id} className="cyber-card" style={{ padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.07)', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                          <div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>Sesión #{String(s.id).slice(-4)}</div>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{s.events.length} eventos detectados</div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--success)' }}>Inicio: {s.startTime}</div>
+                            <div style={{ fontSize: '0.82rem', color: s.endTime ? 'var(--danger)' : 'var(--accent-cyan)', marginTop: '2px' }}>Fin: {s.endTime || 'En progreso...'}</div>
+                          </div>
+                        </div>
+                        <div style={{ maxHeight: '150px', overflowY: 'auto', display: 'grid', gap: '0.4rem' }}>
+                          {s.events.slice(0, 5).map(ev => (
+                            <div key={ev.id} style={{ display: 'flex', gap: '10px', fontSize: '0.84rem', color: 'var(--text-secondary)', padding: '6px 10px', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', borderLeft: `2px solid ${ev.type === 'in' ? 'var(--success)' : 'var(--danger)'}` }}>
+                              <span style={{ color: 'var(--text-muted)', minWidth: '40px' }}>{ev.time}</span>
+                              <span>{ev.msg}</span>
+                            </div>
+                          ))}
+                          {s.events.length > 5 && <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', padding: '4px 10px' }}>+ {s.events.length - 5} eventos más...</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* USERS — Solo admin */}
+        {activeTab === 'users' && isAdmin && (
+          <div style={{ animation: 'fadeInUp 0.5s ease' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{users.length} usuarios en {currentUser.supermercado || 'Sede Principal'}</span>
+              <button className="btn btn-primary" onClick={() => setShowAddUser(!showAddUser)}><UserPlus size={16}/><span>{showAddUser ? 'Cancelar' : 'Agregar Usuario'}</span></button>
+            </div>
+
+            {showAddUser && (
+              <div className="cyber-card" style={{ marginBottom: '1.5rem' }}>
+                <div className="card-header"><span className="card-title text-gradient">Nuevo Usuario</span></div>
+                <div className="card-body">
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    if (!newUser.name || !newUser.username || !newUser.password || !newUser.supermercado) { toast.error('Completa todos los campos'); return }
+                    try { await axios.post(API_USERS, newUser); setNewUser({ name: '', username: '', password: '', role: 'user', supermercado: currentUser.supermercado || 'Sede Principal' }); setShowAddUser(false); toast.success('Usuario creado'); fetchUsers() } catch(err) { toast.error('Error: el usuario ya existe') }
+                  }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                      <div><label className="form-label">Nombre completo</label><input className="form-input" placeholder="Ej: Juan Pérez" value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} required /></div>
+                      <div><label className="form-label">Usuario</label><input className="form-input" placeholder="Ej: juanp" value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} required /></div>
+                      <div><label className="form-label">Contraseña</label><input className="form-input" type="password" placeholder="••••••••" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required /></div>
+                      <div><label className="form-label">Supermercado</label><input className="form-input" value={newUser.supermercado} onChange={e => setNewUser({...newUser, supermercado: e.target.value})} required /></div>
+                      <div><label className="form-label">Rol</label>
+                        <select className="form-input" value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
+                          <option value="user">Cajero / Operador</option>
+                          <option value="admin">Administrador</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button type="submit" className="btn btn-primary"><UserPlus size={16}/><span>Crear Usuario</span></button>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            <div className="cyber-card">
+              <div className="card-header"><span className="card-title">Usuarios del Sistema</span></div>
+              <div className="card-body">
+                <div style={{ display: 'grid', gap: '0.5rem' }}>
+                  {users.map((u, i) => (
+                    <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr auto', alignItems: 'center', padding: '1rem 1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '14px', border: '1px solid transparent', transition: 'all 0.2s', gap: '1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1rem', color: 'white', background: u.role === 'admin' ? 'var(--accent-gradient)' : 'linear-gradient(135deg, #10b981, #059669)', boxShadow: u.role === 'admin' ? '0 0 15px rgba(176,38,255,0.4)' : 'none' }}>{u.name.charAt(0)}</div>
+                        <div><div style={{ fontWeight: 600, fontSize: '0.92rem' }}>{u.name}</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>@{u.username}</div></div>
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}><Store size={12} style={{marginRight:'4px', verticalAlign:'middle'}}/>{u.supermercado || 'Sede Principal'}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(u.createdAt).toLocaleDateString('es-CO')}</div>
+                      <div><span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 700, background: u.role === 'admin' ? 'rgba(176,38,255,0.15)' : 'rgba(148,163,184,0.1)', color: u.role === 'admin' ? '#d97dff' : '#cbd5e1', border: `1px solid ${u.role === 'admin' ? 'rgba(176,38,255,0.3)' : 'rgba(148,163,184,0.2)'}` }}><Shield size={10}/>{u.role === 'admin' ? 'Admin' : 'Operador'}</span></div>
+                      <div>{u.role !== 'admin' && <button onClick={async () => { if (!window.confirm('¿Eliminar?')) return; try { await axios.delete(`${API_USERS}/${u.id}`); toast.success('Eliminado'); fetchUsers() } catch(e){ toast.error('Error') }}} style={{ background: 'rgba(255,0,85,0.1)', color: '#ff0055', border: '1px solid rgba(255,0,85,0.3)', padding: '6px', borderRadius: '8px', cursor: 'pointer' }}><Trash2 size={14}/></button>}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
     </div>
   )
