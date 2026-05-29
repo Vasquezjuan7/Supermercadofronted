@@ -339,7 +339,7 @@ function Dashboard({ currentUser, onLogout }) {
               <div className="card-body">
                   <div className="stream-container" style={{ height: '480px' }}>
                       <video ref={videoRef} autoPlay playsInline muted />
-                      {isAiActive && <div className="scan-line" />}
+                      <div className="scan-line" style={{ display: isAiActive ? 'block' : 'none' }} />
                       <div className="stream-overlay" />
                       <div className={`stream-badge ${isAiActive ? 'ai-active' : ''}`} style={{ background: isAiActive ? 'rgba(16, 185, 129, 0.9)' : 'rgba(71, 85, 105, 0.9)' }}>
                           <span className="dot" style={{ background: isAiActive ? '#fff' : '#94a3b8' }} />{isAiActive ? 'PROCESANDO' : 'EN ESPERA'}
