@@ -510,10 +510,19 @@ body::before {
   animation: fadeInUp 0.4s backwards;
 }
 .product-row.with-delete { grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr auto; }
+.product-row.low-stock {
+  background: rgba(255, 0, 85, 0.05);
+  border-color: rgba(255, 0, 85, 0.3);
+}
 .product-row:hover {
   background: rgba(255,255,255,0.05);
   border-color: rgba(255,255,255,0.1);
   transform: translateX(5px);
+}
+.product-row.low-stock:hover {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: rgba(255, 0, 85, 0.6);
+  box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);
 }
 .product-info { display: flex; align-items: center; gap: 1rem; }
 .product-img {

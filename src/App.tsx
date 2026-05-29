@@ -516,7 +516,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                 <div className={`table-header ${can('delete_product') ? 'with-delete' : ''}`}><span>Producto</span><span className="hide-mobile">Sector</span><span>Precio</span><span>Cantidad</span><span className="hide-mobile">Estado</span>{can('delete_product') && <span>Acciones</span>}</div>
                 <div className="inventory-grid">
                   {products.map((p, i) => (
-                    <div key={p.id} className={`product-row ${can('delete_product') ? 'with-delete' : ''}`} style={{ animationDelay: `${i * 0.05}s` }}>
+                    <div key={p.id} className={`product-row ${can('delete_product') ? 'with-delete' : ''} ${p.quantity <= 2 ? 'low-stock' : ''}`} style={{ animationDelay: `${i * 0.05}s` }}>
                       <div className="product-info"><img src={(SMART_MAPPING as any)[p.name]?.img || '/products/atun.png'} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">ID: {p.id.slice(-6).toUpperCase()}</div></div></div>
                       <div className="hide-mobile" style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
                       <div style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{formatCOP(p.price || 0)}</div>
