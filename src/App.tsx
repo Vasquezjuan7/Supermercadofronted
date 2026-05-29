@@ -107,7 +107,9 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
   return (
     <div className="login-screen">
       <div className="login-card">
-        <div className="login-logo"><ScanFace size={32} color="white" /></div>
+        <div className="flex justify-center mb-4">
+          <img src="/logo_circular.png" alt="Vision Pro Logo" style={{ width: '64px', height: '64px', borderRadius: '50%', boxShadow: '0 0 20px rgba(0, 240, 255, 0.4)' }} />
+        </div>
         <h2 className="login-title">VISION <span className="text-gradient">PRO</span></h2>
         <p className="login-subtitle">Neural Interface & Inventory Management</p>
         {error && <div style={{color:'#ff0055', fontSize:'0.85rem', marginBottom:'1rem'}}><AlertTriangle size={14} style={{verticalAlign:'middle', marginRight:'5px'}}/>{error}</div>}
