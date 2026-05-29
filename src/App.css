@@ -384,7 +384,8 @@ body::before {
   gap: 1.5rem;
   flex-direction: row;
 }
-@media (max-width: 1024px) { .camera-hud { flexDirection: column; } }
+@media (max-width: 1024px) { .camera-hud { flex-direction: column; } }
+.laser-beam.laser-hidden { display: none; }
 
 .video-wrapper {
   flex: 2;

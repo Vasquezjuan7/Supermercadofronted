@@ -300,9 +300,9 @@ function Dashboard({ currentUser, onLogout }) {
             <div className="card-body camera-hud">
               <div className="video-wrapper hud-corners">
                 <video ref={videoRef} autoPlay playsInline muted />
-                {isAiActive && <div className="laser-beam" />}
+                <div className={`laser-beam${isAiActive ? '' : ' laser-hidden'}`} />
                 <div className={`live-badge ${isAiActive ? 'processing' : 'idle'}`}>
-                  <span className="dot" /> {isAiActive ? 'ANALYZING LIVE FEED' : 'STANDBY MODE'}
+                  <span className="dot" /><span>{isAiActive ? 'ANALYZING LIVE FEED' : 'STANDBY MODE'}</span>
                 </div>
               </div>
               
