@@ -10,6 +10,7 @@ import './App.css'
 
 const API_BASE = '/proxy/backend/api/products'
 const API_USERS = '/proxy/backend/api/users'
+const API_SESSIONS = '/proxy/backend/api/sessions'
 const API_IA = '/proxy/ia/detect_all'
 const SOUND_IN = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'
 const SOUND_OUT = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'
@@ -41,7 +42,8 @@ export interface LogEvent {
 }
 
 export interface Session {
-  id: number;
+  id?: string;
+  sessionId: number;
   startTime: string;
   endTime: string | null;
   events: LogEvent[];
@@ -144,7 +146,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
   const [isSyncing, setIsSyncing] = useState(false)
   
   const [isAiActive, setIsAiActive] = useState(false)
-  const [sessions, setSessions] = useState<Session[]>(JSON.parse(localStorage.getItem('ucc_sessions') || '[]'))
+  const [sessions, setSessions] = useState<Session[]>([])
   const currentSession = useRef<Session | null>(null)
 
   const [showAddProduct, setShowAddProduct] = useState(false)
@@ -201,9 +203,15 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
     try { const res = await axios.get(API_USERS); setUsers(res.data) } catch (err) { console.error("Error fetching users") }
   }, [isAdmin])
 
+  const fetchSessions = useCallback(async () => {
+    if (!can('see_reports')) return
+    try { const res = await axios.get(API_SESSIONS); setSessions(res.data) } catch (err) { console.error("Error fetching sessions") }
+  }, [role])
+
   useEffect(() => { fetchProducts() }, [fetchProducts])
   useEffect(() => { if (activeTab === 'camera') setupCamera() }, [activeTab])
   useEffect(() => { if (activeTab === 'users') fetchUsers() }, [activeTab, fetchUsers])
+  useEffect(() => { if (activeTab === 'reports') fetchSessions() }, [activeTab, fetchSessions])
 
   async function setupCamera() {
     try {
@@ -261,15 +269,19 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
       return () => clearInterval(i) 
   }, [isAiActive, products, shelfState, activeTab])
 
-  const toggleAI = () => {
+  const toggleAI = async () => {
       if (!isAiActive) {
-          currentSession.current = { id: Date.now(), startTime: new Date().toLocaleString(), events: [], endTime: null }
+          currentSession.current = { sessionId: Date.now(), startTime: new Date().toLocaleString(), events: [], endTime: null }
           toast.success("Enlace Neuronal Establecido")
       } else {
           if (currentSession.current) {
               currentSession.current.endTime = new Date().toLocaleString()
-              const updatedSessions = [currentSession.current, ...sessions]
-              setSessions(updatedSessions); localStorage.setItem('ucc_sessions', JSON.stringify(updatedSessions))
+              try {
+                await axios.post(API_SESSIONS, currentSession.current)
+                if (activeTab === 'reports') fetchSessions()
+              } catch (e) {
+                console.error("No se pudo guardar la sesión en la nube", e)
+              }
               currentSession.current = null
           }
           toast.success("Enlace Neuronal Desconectado")
@@ -532,8 +544,8 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                       <div key={s.id} className="cyber-card" style={{ padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.07)', paddingBottom: '1rem', marginBottom: '1rem' }}>
                           <div>
-                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>Sesión #{String(s.id).slice(-4)}</div>
-                            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{s.events.length} eventos detectados</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>Sesión #{String(s.sessionId).slice(-4)}</div>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{s.events ? s.events.length : 0} eventos detectados</div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
                             <div style={{ fontSize: '0.82rem', color: 'var(--success)' }}>Inicio: {s.startTime}</div>
@@ -541,13 +553,13 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                           </div>
                         </div>
                         <div style={{ maxHeight: '150px', overflowY: 'auto', display: 'grid', gap: '0.4rem' }}>
-                          {s.events.slice(0, 5).map(ev => (
+                          {(s.events || []).slice(0, 5).map(ev => (
                             <div key={ev.id} style={{ display: 'flex', gap: '10px', fontSize: '0.84rem', color: 'var(--text-secondary)', padding: '6px 10px', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', borderLeft: `2px solid ${ev.type === 'in' ? 'var(--success)' : 'var(--danger)'}` }}>
                               <span style={{ color: 'var(--text-muted)', minWidth: '40px' }}>{ev.time}</span>
                               <span>{ev.msg}</span>
                             </div>
                           ))}
-                          {s.events.length > 5 && <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', padding: '4px 10px' }}>+ {s.events.length - 5} eventos más...</div>}
+                          {(s.events || []).length > 5 && <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', padding: '4px 10px' }}>+ {s.events.length - 5} eventos más...</div>}
                         </div>
                       </div>
                     ))}
