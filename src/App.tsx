@@ -5,7 +5,7 @@ import {
   ScanFace, Package, PackagePlus, RefreshCcw, LayoutDashboard,
   ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus
 } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import './App.css'
 
 const API_BASE = '/proxy/backend/api/products'
@@ -402,15 +402,30 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
               <div className="card-header"><span className="card-title"><Activity size={16}/><span>Análisis de Stock</span></span></div>
               <div className="card-body" style={{ height: '300px', paddingTop: '1rem' }}>
                 <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                  <BarChart data={products}>
+                  <BarChart data={products} margin={{ top: 25, right: 20, left: -20, bottom: 65 }}>
+                    <defs>
+                      <linearGradient id="colorHealthy" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#00f0ff" stopOpacity={0.9}/>
+                        <stop offset="95%" stopColor="#b026ff" stopOpacity={0.4}/>
+                      </linearGradient>
+                      <linearGradient id="colorWarning" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ffaa00" stopOpacity={0.9}/>
+                        <stop offset="95%" stopColor="#ffaa00" stopOpacity={0.3}/>
+                      </linearGradient>
+                      <linearGradient id="colorCritical" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#ff0055" stopOpacity={0.9}/>
+                        <stop offset="95%" stopColor="#ff0055" stopOpacity={0.3}/>
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} angle={-45} textAnchor="end" interval={0} />
                     <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} contentStyle={{ backgroundColor: 'rgba(10,10,15,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }} />
-                    <Bar dataKey="quantity" radius={[4, 4, 0, 0]}>
+                    <Tooltip cursor={{ fill: 'rgba(0,240,255,0.05)' }} contentStyle={{ backgroundColor: 'rgba(10,10,15,0.95)', border: '1px solid rgba(0,240,255,0.2)', borderRadius: '8px', color: '#fff', boxShadow: '0 0 15px rgba(0,240,255,0.1)' }} />
+                    <Bar dataKey="quantity" radius={[6, 6, 0, 0]} maxBarSize={50}>
                       {products.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.quantity <= 2 ? '#ff0055' : entry.quantity < 10 ? '#ffaa00' : '#00f0ff'} />
+                        <Cell key={`cell-${index}`} fill={entry.quantity <= 2 ? 'url(#colorCritical)' : entry.quantity < 10 ? 'url(#colorWarning)' : 'url(#colorHealthy)'} />
                       ))}
+                      <LabelList dataKey="quantity" position="top" fill="#ffffff" fontSize={11} fontWeight={600} style={{ textShadow: '0 0 5px rgba(0,0,0,0.5)' }} />
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
