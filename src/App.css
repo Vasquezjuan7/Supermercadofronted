@@ -660,7 +660,7 @@ body::before {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .app-shell {
     flex-direction: column;
   }
@@ -695,12 +695,16 @@ body::before {
   .nav-item {
     width: auto;
     height: 100%;
-    padding: 10px;
+    padding: 5px 10px;
     justify-content: center;
+    flex-direction: column;
+    gap: 4px;
   }
   
   .nav-label {
-    display: none;
+    display: block !important;
+    font-size: 0.65rem;
+    font-weight: 600;
   }
   
   .nav-item.active::after {
@@ -714,6 +718,9 @@ body::before {
   .nav-item.active svg {
     color: var(--accent-cyan);
     filter: drop-shadow(0 0 5px var(--accent-cyan));
+  }
+  .nav-item.active .nav-label {
+    color: var(--accent-cyan);
   }
   
   /* Main content adjusts to bottom nav */
