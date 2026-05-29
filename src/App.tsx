@@ -378,7 +378,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
             <div className="cyber-card">
               <div className="card-header"><span className="card-title"><Activity size={16}/><span>Stock Analytics</span></span></div>
               <div className="card-body" style={{ height: '300px', paddingTop: '1rem' }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <BarChart data={products}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                     <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
