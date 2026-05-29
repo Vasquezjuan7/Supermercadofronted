@@ -99,6 +99,7 @@ function Dashboard({ currentUser, onLogout }) {
   const [logs, setLogs] = useState([])
   const [activeTab, setActiveTab] = useState('dashboard')
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
   
   const [isAiActive, setIsAiActive] = useState(false)
   const [sessions, setSessions] = useState(JSON.parse(localStorage.getItem('ucc_sessions') || '[]'))
@@ -114,11 +115,44 @@ function Dashboard({ currentUser, onLogout }) {
   const videoRef = useRef(null)
   const isProcessing = useRef(false)
   const lastActionTime = useRef({})
-  const isAdmin = currentUser.role === 'admin'
+  const role = currentUser.role || 'cajero'
+
+  // ── Permisos por rol ──────────────────────────────────
+  const ROLES = {
+    admin:      { label: 'Administrador', color: '#b026ff', bg: 'rgba(176,38,255,0.15)', border: 'rgba(176,38,255,0.35)', icon: '🛡️' },
+    supervisor: { label: 'Supervisor',    color: '#00f0ff', bg: 'rgba(0,240,255,0.1)',   border: 'rgba(0,240,255,0.3)',   icon: '👁️' },
+    inventario: { label: 'Inventario',    color: '#00ff88', bg: 'rgba(0,255,136,0.1)',   border: 'rgba(0,255,136,0.3)',   icon: '📦' },
+    cajero:     { label: 'Cajero',        color: '#ffaa00', bg: 'rgba(255,170,0,0.1)',   border: 'rgba(255,170,0,0.3)',   icon: '🧾' },
+  }
+  const can = (permission) => {
+    const perms = {
+      see_camera:     ['admin', 'supervisor', 'cajero'],
+      see_inventory:  ['admin', 'supervisor', 'inventario'],
+      edit_inventory: ['admin', 'inventario'],
+      see_reports:    ['admin', 'supervisor', 'inventario'],
+      see_users:      ['admin'],
+      delete_product: ['admin'],
+    }
+    return (perms[permission] || []).includes(role)
+  }
+  const isAdmin = role === 'admin'
 
   const fetchProducts = useCallback(async () => {
     try { const res = await axios.get(API_BASE); setProducts(res.data) } catch (err) { console.error("DB Error") }
   }, [])
+
+  const handleSync = async () => {
+    setIsSyncing(true)
+    try {
+      const res = await axios.get(API_BASE)
+      setProducts(res.data)
+      toast.success(`Base de datos sincronizada — ${res.data.length} productos`)
+    } catch (err) {
+      toast.error('Error al sincronizar con la BD')
+    } finally {
+      setIsSyncing(false)
+    }
+  }
 
   const fetchUsers = useCallback(async () => {
     if (!isAdmin) return
@@ -216,11 +250,11 @@ function Dashboard({ currentUser, onLogout }) {
   }
 
   const navItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Overview' },
-    { id: 'camera', icon: Crosshair, label: 'Neural Camera' },
-    { id: 'inventory', icon: Package, label: 'Inventory Core' },
-    { id: 'reports', icon: Activity, label: 'System Logs' },
-    ...(isAdmin ? [{ id: 'users', icon: Shield, label: 'Security' }] : []),
+    { id: 'dashboard',  icon: LayoutDashboard, label: 'Overview' },
+    ...(can('see_camera')    ? [{ id: 'camera',    icon: Crosshair,  label: 'Neural Camera'  }] : []),
+    ...(can('see_inventory') ? [{ id: 'inventory', icon: Package,    label: 'Inventory Core' }] : []),
+    ...(can('see_reports')   ? [{ id: 'reports',   icon: Activity,   label: 'System Logs'    }] : []),
+    ...(can('see_users')     ? [{ id: 'users',     icon: Shield,     label: 'Security'       }] : []),
   ]
 
   return (
@@ -257,8 +291,10 @@ function Dashboard({ currentUser, onLogout }) {
             <p className="subtitle">System Node // {currentUser.supermercado || 'Main Hub'}</p>
           </div>
           <div className="header-actions">
-            <div className="user-badge">
-              <span className="status-dot"></span><span>{currentUser.name} [{currentUser.role.toUpperCase()}]</span>
+            <div className="user-badge" style={{ borderColor: (ROLES[role] || ROLES.cajero).border }}>
+              <span className="status-dot" style={{ background: (ROLES[role] || ROLES.cajero).color, boxShadow: `0 0 8px ${(ROLES[role] || ROLES.cajero).color}` }}></span>
+              <span>{currentUser.name}</span>
+              <span style={{ padding: '2px 8px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, background: (ROLES[role] || ROLES.cajero).bg, color: (ROLES[role] || ROLES.cajero).color, border: `1px solid ${(ROLES[role] || ROLES.cajero).border}` }}>{(ROLES[role] || ROLES.cajero).label.toUpperCase()}</span>
             </div>
             <button className="btn" onClick={fetchProducts}><RefreshCcw size={16} /><span>Sync DB</span></button>
           </div>
@@ -346,7 +382,7 @@ function Dashboard({ currentUser, onLogout }) {
         {activeTab === 'inventory' && (
           <div style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
-              {isAdmin && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/><span>{showAddProduct ? 'Cancel' : 'Register Item'}</span></button>}
+              {can('edit_inventory') && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/><span>{showAddProduct ? 'Cancel' : 'Register Item'}</span></button>}
             </div>
 
             {showAddProduct && (
@@ -366,7 +402,7 @@ function Dashboard({ currentUser, onLogout }) {
             <div className="cyber-card">
               <div className="card-header"><span className="card-title">Database Core</span></div>
               <div className="card-body">
-                <div className="table-header"><span>Asset</span><span>Sector</span><span>Quantity</span><span>Status</span>{isAdmin && <span>Override</span>}</div>
+                <div className="table-header"><span>Asset</span><span>Sector</span><span>Quantity</span><span>Status</span>{can('delete_product') && <span>Override</span>}</div>
                 <div className="inventory-grid">
                   {products.map((p, i) => (
                     <div key={p.id} className="product-row" style={{ animationDelay: `${i * 0.05}s` }}>
@@ -374,7 +410,7 @@ function Dashboard({ currentUser, onLogout }) {
                       <div style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
                       <div className="product-qty">{p.quantity}<span>u</span></div>
                       <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot"></span><span>{p.quantity > 2 ? 'OPTIMAL' : 'CRITICAL'}</span></span></div>
-                      {isAdmin && <div><button onClick={() => handleDeleteProduct(p.id)} className="btn" style={{ padding: '6px', color:'#ff0055', borderColor:'rgba(255,0,85,0.3)' }}><Trash2 size={16} /></button></div>}
+                      {can('delete_product') && <div><button onClick={() => handleDeleteProduct(p.id)} className="btn" style={{ padding: '6px', color:'#ff0055', borderColor:'rgba(255,0,85,0.3)' }}><Trash2 size={16} /></button></div>}
                     </div>
                   ))}
                 </div>
@@ -445,18 +481,33 @@ function Dashboard({ currentUser, onLogout }) {
                   <form onSubmit={async (e) => {
                     e.preventDefault()
                     if (!newUser.name || !newUser.username || !newUser.password || !newUser.supermercado) { toast.error('Completa todos los campos'); return }
-                    try { await axios.post(API_USERS, newUser); setNewUser({ name: '', username: '', password: '', role: 'user', supermercado: currentUser.supermercado || 'Sede Principal' }); setShowAddUser(false); toast.success('Usuario creado'); fetchUsers() } catch(err) { toast.error('Error: el usuario ya existe') }
+                    try { await axios.post(API_USERS, newUser); setNewUser({ name: '', username: '', password: '', role: 'cajero', supermercado: currentUser.supermercado || 'Sede Principal' }); setShowAddUser(false); toast.success('Usuario creado'); fetchUsers() } catch(err) { toast.error('Error: el usuario ya existe') }
                   }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                       <div><label className="form-label">Nombre completo</label><input className="form-input" placeholder="Ej: Juan Pérez" value={newUser.name} onChange={e => setNewUser({...newUser, name: e.target.value})} required /></div>
                       <div><label className="form-label">Usuario</label><input className="form-input" placeholder="Ej: juanp" value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} required /></div>
                       <div><label className="form-label">Contraseña</label><input className="form-input" type="password" placeholder="••••••••" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required /></div>
                       <div><label className="form-label">Supermercado</label><input className="form-input" value={newUser.supermercado} onChange={e => setNewUser({...newUser, supermercado: e.target.value})} required /></div>
-                      <div><label className="form-label">Rol</label>
-                        <select className="form-input" value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
-                          <option value="user">Cajero / Operador</option>
-                          <option value="admin">Administrador</option>
-                        </select>
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <label className="form-label">Rol del Usuario</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.5rem' }}>
+                          {Object.entries(ROLES).map(([key, r]) => (
+                            <div key={key} onClick={() => setNewUser({...newUser, role: key})}
+                              style={{ padding: '0.85rem 1rem', borderRadius: '12px', border: `2px solid ${newUser.role === key ? r.color : 'rgba(255,255,255,0.06)'}`, background: newUser.role === key ? r.bg : 'rgba(255,255,255,0.02)', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <span style={{ fontSize: '1.4rem' }}>{r.icon}</span>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: newUser.role === key ? r.color : '#fff' }}>{r.label}</div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                  {key === 'admin'      && 'Acceso total al sistema'}
+                                  {key === 'supervisor' && 'Ve cámara, inventario y reportes'}
+                                  {key === 'inventario' && 'Gestiona productos y reportes'}
+                                  {key === 'cajero'     && 'Solo dashboard y cámara IA'}
+                                </div>
+                              </div>
+                              {newUser.role === key && <span style={{ marginLeft: 'auto', color: r.color, fontSize: '1.1rem' }}>✓</span>}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <button type="submit" className="btn btn-primary"><UserPlus size={16}/><span>Crear Usuario</span></button>
@@ -472,12 +523,12 @@ function Dashboard({ currentUser, onLogout }) {
                   {users.map((u, i) => (
                     <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr auto', alignItems: 'center', padding: '1rem 1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '14px', border: '1px solid transparent', transition: 'all 0.2s', gap: '1rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1rem', color: 'white', background: u.role === 'admin' ? 'var(--accent-gradient)' : 'linear-gradient(135deg, #10b981, #059669)', boxShadow: u.role === 'admin' ? '0 0 15px rgba(176,38,255,0.4)' : 'none' }}>{u.name.charAt(0)}</div>
+                        <div style={{ width: '44px', height: '44px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.1rem', background: (ROLES[u.role] || ROLES.cajero).bg, border: `2px solid ${(ROLES[u.role] || ROLES.cajero).border}`, color: (ROLES[u.role] || ROLES.cajero).color }}>{u.name.charAt(0)}</div>
                         <div><div style={{ fontWeight: 600, fontSize: '0.92rem' }}>{u.name}</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>@{u.username}</div></div>
                       </div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}><Store size={12} style={{marginRight:'4px', verticalAlign:'middle'}}/>{u.supermercado || 'Sede Principal'}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(u.createdAt).toLocaleDateString('es-CO')}</div>
-                      <div><span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 700, background: u.role === 'admin' ? 'rgba(176,38,255,0.15)' : 'rgba(148,163,184,0.1)', color: u.role === 'admin' ? '#d97dff' : '#cbd5e1', border: `1px solid ${u.role === 'admin' ? 'rgba(176,38,255,0.3)' : 'rgba(148,163,184,0.2)'}` }}><Shield size={10}/>{u.role === 'admin' ? 'Admin' : 'Operador'}</span></div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-CO') : '—'}</div>
+                      <div><span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 12px', borderRadius: '12px', fontSize: '0.72rem', fontWeight: 700, background: (ROLES[u.role] || ROLES.cajero).bg, color: (ROLES[u.role] || ROLES.cajero).color, border: `1px solid ${(ROLES[u.role] || ROLES.cajero).border}` }}><span>{(ROLES[u.role] || ROLES.cajero).icon}</span><span>{(ROLES[u.role] || ROLES.cajero).label}</span></span></div>
                       <div>{u.role !== 'admin' && <button onClick={async () => { if (!window.confirm('¿Eliminar?')) return; try { await axios.delete(`${API_USERS}/${u.id}`); toast.success('Eliminado'); fetchUsers() } catch(e){ toast.error('Error') }}} style={{ background: 'rgba(255,0,85,0.1)', color: '#ff0055', border: '1px solid rgba(255,0,85,0.3)', padding: '6px', borderRadius: '8px', cursor: 'pointer' }}><Trash2 size={14}/></button>}</div>
                     </div>
                   ))}
