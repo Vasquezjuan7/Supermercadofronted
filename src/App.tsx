@@ -255,11 +255,10 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
     const syncInterval = setInterval(() => {
       fetchProducts()
       if (activeTab === 'reports') fetchSessions()
-      if (activeTab === 'chat') {
-        fetchMessages()
-        // Also poll for notifications in other chats
-        checkUnreadMessages()
-      }
+      if (activeTab === 'chat') fetchMessages()
+      
+      // Always poll for notifications regardless of the active tab
+      checkUnreadMessages()
     }, 2500)
     return () => clearInterval(syncInterval)
   }, [fetchProducts, fetchSessions, fetchMessages, activeTab, users, currentUser, chatTarget])
@@ -273,7 +272,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
       if (msgsG.length > 0) {
         const last = msgsG[msgsG.length - 1];
         if (last.senderId !== String(currentUser.id) && lastSeenMsgIds.current['general'] && lastSeenMsgIds.current['general'] !== last.id) {
-          if (chatTarget !== 'general') {
+          if (activeTab !== 'chat' || chatTarget !== 'general') {
             setUnreadCounts(prev => ({...prev, general: true ? 1 : 0}))
             toast(`Nuevo mensaje en General de ${last.senderName}`, { icon: '💬', id: `msg-${last.id}` })
           }
@@ -289,7 +288,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
         if (msgs.length > 0) {
           const last = msgs[msgs.length - 1];
           if (last.senderId === String(u.id) && lastSeenMsgIds.current[String(u.id)] && lastSeenMsgIds.current[String(u.id)] !== last.id) {
-            if (chatTarget !== String(u.id)) {
+            if (activeTab !== 'chat' || chatTarget !== String(u.id)) {
               setUnreadCounts(prev => ({...prev, [u.id]: true ? 1 : 0}))
               toast(`Nuevo mensaje de ${last.senderName}`, { icon: '💬', id: `msg-${last.id}` })
             }
@@ -302,12 +301,12 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
     }
   }
 
-  // Clear unread when clicking a chat
+  // Clear unread when viewing a chat
   useEffect(() => {
-    if (chatTarget) {
+    if (activeTab === 'chat' && chatTarget) {
       setUnreadCounts(prev => ({...prev, [chatTarget]: 0}))
     }
-  }, [chatTarget])
+  }, [chatTarget, activeTab])
 
   async function setupCamera() {
     try {
