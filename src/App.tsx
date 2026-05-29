@@ -3,7 +3,7 @@ import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import {
   ScanFace, Package, PackagePlus, RefreshCcw, LayoutDashboard,
-  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus, MessageSquare, Send, FileText
+  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus, MessageSquare, Send, FileText, ChevronUp, ChevronDown
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import jsPDF from 'jspdf'
@@ -810,18 +810,16 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
             </div>
             
             <div className="chat-main" style={{ position: 'relative' }}>
-              <div style={{ padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 'bold', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>{chatTarget === 'general' ? 'Canal General' : users.find(u => String(u.id) === chatTarget)?.name || 'Cargando...'}</span>
+              <div 
+                onClick={() => setShowMobileContacts(!showMobileContacts)}
+                style={{ padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 'bold', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: showMobileContacts ? 'rgba(0, 240, 255, 0.05)' : 'transparent', transition: 'background 0.3s' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>{chatTarget === 'general' ? 'Canal General' : users.find(u => String(u.id) === chatTarget)?.name || 'Cargando...'}</span>
+                  {showMobileContacts ? <ChevronUp size={18} color="var(--accent-cyan)" /> : <ChevronDown size={18} color="var(--accent-cyan)" />}
+                </div>
                 
-                {/* Botón de contactos móvil */}
-                <button 
-                  className="mobile-contacts-btn" 
-                  onClick={() => setShowMobileContacts(!showMobileContacts)}
-                  style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '6px 12px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-                >
-                  <Users size={16} /> Contactos
-                  {Object.values(unreadCounts).some(c => c > 0) && <span className="unread-dot" style={{ position: 'static', marginLeft: '5px' }}></span>}
-                </button>
+                {Object.values(unreadCounts).some(c => c > 0) && <span className="unread-dot" style={{ position: 'static' }}></span>}
               </div>
 
               {/* Menú Desplegable de Contactos */}

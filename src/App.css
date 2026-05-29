@@ -677,8 +677,7 @@ body::before {
     justify-content: flex-start;
     align-items: center;
     padding: 0 10px;
-    overflow-x: visible;
-    flex-wrap: wrap;
+    overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
     z-index: 1000;
