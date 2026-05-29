@@ -258,9 +258,9 @@ function Dashboard({ currentUser, onLogout }) {
           </div>
           <div className="header-actions">
             <div className="user-badge">
-              <span className="status-dot" /> {currentUser.name} [{currentUser.role.toUpperCase()}]
+              <span className="status-dot"></span><span>{currentUser.name} [{currentUser.role.toUpperCase()}]</span>
             </div>
-            <button className="btn" onClick={fetchProducts}><RefreshCcw size={16} /> Sync DB</button>
+            <button className="btn" onClick={fetchProducts}><RefreshCcw size={16} /><span>Sync DB</span></button>
           </div>
         </div>
 
@@ -275,7 +275,7 @@ function Dashboard({ currentUser, onLogout }) {
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
             <div className="cyber-card">
-              <div className="card-header"><span className="card-title"><Activity size={16}/> Neural Network Logs</span><span style={{color:'var(--accent-cyan)'}}>{logs.length} Events</span></div>
+              <div className="card-header"><span className="card-title"><Activity size={16}/><span>Neural Network Logs</span></span><span style={{color:'var(--accent-cyan)'}}>{logs.length} Events</span></div>
               <div className="card-body" style={{ maxHeight: '300px', overflowY: 'auto' }}>
                 {logs.length === 0 ? <div className="empty-state"><Activity size={32} className="empty-icon"/><p>Waiting for neural signals...</p></div> : 
                  logs.map((log, i) => <div key={log.id} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px', background:'rgba(255,255,255,0.02)', borderLeft:`2px solid ${log.type==='in'?'#00ff88':'#ff0055'}`, marginBottom:'8px', borderRadius:'6px'}}>
@@ -291,9 +291,9 @@ function Dashboard({ currentUser, onLogout }) {
         {activeTab === 'camera' && (
           <div className="cyber-card camera-container" style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div className="card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <span className="card-title"><Crosshair size={18} color="var(--accent-cyan)" /> Neural Vision Array</span>
+              <span className="card-title"><Crosshair size={18} color="var(--accent-cyan)" /><span>Neural Vision Array</span></span>
               <button onClick={toggleAI} className={`btn ${isAiActive ? 'btn-danger' : 'btn-primary'}`}>
-                {isAiActive ? <><Square size={16}/> DISCONNECT</> : <><Play size={16}/> INITIALIZE AI</>}
+                {isAiActive ? <><Square size={16}/><span>DISCONNECT</span></> : <><Play size={16}/><span>INITIALIZE AI</span></>}
               </button>
             </div>
             
@@ -343,7 +343,7 @@ function Dashboard({ currentUser, onLogout }) {
         {activeTab === 'inventory' && (
           <div style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
-              {isAdmin && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/> {showAddProduct ? 'Cancel' : 'Register Item'}</button>}
+              {isAdmin && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/><span>{showAddProduct ? 'Cancel' : 'Register Item'}</span></button>}
             </div>
 
             {showAddProduct && (
@@ -370,7 +370,7 @@ function Dashboard({ currentUser, onLogout }) {
                       <div className="product-info"><img src={SMART_MAPPING[p.name]?.img || '/products/atun.png'} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">ID: {p.id.slice(-6).toUpperCase()}</div></div></div>
                       <div style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
                       <div className="product-qty">{p.quantity}<span>u</span></div>
-                      <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot"/>{p.quantity > 2 ? 'OPTIMAL' : 'CRITICAL'}</span></div>
+                      <div><span className={`status-badge ${p.quantity > 2 ? 'healthy' : 'low'}`}><span className="status-dot"></span><span>{p.quantity > 2 ? 'OPTIMAL' : 'CRITICAL'}</span></span></div>
                       {isAdmin && <div><button onClick={() => handleDeleteProduct(p.id)} className="btn" style={{ padding: '6px', color:'#ff0055', borderColor:'rgba(255,0,85,0.3)' }}><Trash2 size={16} /></button></div>}
                     </div>
                   ))}
