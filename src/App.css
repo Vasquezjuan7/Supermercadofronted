@@ -677,7 +677,8 @@ body::before {
     justify-content: flex-start;
     align-items: center;
     padding: 0 10px;
-    overflow-x: auto;
+    overflow-x: visible;
+    flex-wrap: wrap;
     overflow-y: hidden;
     white-space: nowrap;
     z-index: 1000;
@@ -815,7 +816,8 @@ body::before {
     min-height: auto;
     display: flex;
     flex-direction: row;
-    overflow-x: auto;
+    overflow-x: visible;
+    flex-wrap: wrap;
     overflow-y: hidden;
     padding: 5px 0;
     align-items: center;

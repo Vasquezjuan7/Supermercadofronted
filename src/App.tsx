@@ -826,7 +826,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                       <div key={m.id} className={`chat-bubble ${isMine ? 'sent' : 'received'}`}>
                         {!isMine && chatTarget === 'general' && <div className="chat-bubble-name">{m.senderName}</div>}
                         <div style={{ wordBreak: 'break-word' }}>{m.content}</div>
-                        <div className="chat-bubble-time">{m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</div>
+                        <div className="chat-bubble-time">{m.timestamp ? new Date(m.timestamp + (m.timestamp.endsWith('Z') ? '' : 'Z')).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</div>
                       </div>
                     )
                   })
