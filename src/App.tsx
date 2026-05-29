@@ -423,9 +423,13 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
 
       <main className="main-content">
         <div className="page-header">
-          <div>
+          <div className="mobile-top-logo">
+            <ScanFace size={24} color="var(--accent-cyan)" />
+            <span className="logo-text" style={{ fontSize: '1.2rem' }}>VISION <span className="text-gradient">PRO</span></span>
+          </div>
+          <div className="header-title-container">
             <h1>{navItems.find(i => i.id === activeTab)?.label}</h1>
-            <p className="subtitle">Nodo del Sistema // {currentUser.supermercado || 'Sede Principal'}</p>
+            <p className="subtitle hide-mobile">Nodo del Sistema // {currentUser.supermercado || 'Sede Principal'}</p>
           </div>
           <div className="header-actions">
             <div className="user-badge" style={{ borderColor: (ROLES[role] || ROLES.cajero).border }}>
