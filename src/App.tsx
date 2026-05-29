@@ -95,12 +95,7 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
       const user = res.data
       saveSession(user); onLogin(user); toast.success(`Bienvenido, ${user.name}`)
     } catch(err) {
-      if (username === 'Juan' && password === 'Juan2026') {
-        const adminFallback = { id: 1, username: 'Juan', name: 'Juan Vasquez', role: 'admin', supermercado: 'Sede Principal' }
-        saveSession(adminFallback); onLogin(adminFallback); toast.success(`Bienvenido, ${adminFallback.name} (Modo Local)`)
-      } else {
-        setError('Usuario o contraseña incorrectos')
-      }
+      setError('Usuario o contraseña incorrectos')
     }
   }
 
