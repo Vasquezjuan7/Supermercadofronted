@@ -30,9 +30,9 @@ function getSession() {
 function saveSession(user) { sessionStorage.setItem('ucc_session', JSON.stringify(user)) }
 function clearSession() { sessionStorage.removeItem('ucc_session') }
 
-// ══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // LOGIN SCREEN
-// ══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -51,7 +51,7 @@ function LoginScreen({ onLogin }) {
         const adminFallback = { id: 1, username: 'Juan', name: 'Juan Vasquez', role: 'admin', supermercado: 'Sede Principal' }
         saveSession(adminFallback); onLogin(adminFallback); toast.success(`Bienvenido, ${adminFallback.name} (Modo Local)`)
       } else {
-        setError('Usuario o contraseña incorrectos')
+        setError('Usuario o contraseÃ±a incorrectos')
       }
     }
   }
@@ -69,15 +69,15 @@ function LoginScreen({ onLogin }) {
             <input className="form-input" placeholder="Ingresa tu usuario" value={username} onChange={e => setUsername(e.target.value)} required />
           </div>
           <div className="form-group">
-            <label className="form-label">Contraseña</label>
+            <label className="form-label">ContraseÃ±a</label>
             <div style={{ position: 'relative' }}>
-              <input className="form-input" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required style={{ paddingRight: '40px' }} />
+              <input className="form-input" type={showPassword ? "text" : "password"} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value={password} onChange={e => setPassword(e.target.value)} required style={{ paddingRight: '40px' }} />
               <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '10px', top: '10px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
-          <button type="submit" className="login-btn"><Lock size={16} />Iniciar Sesión</button>
+          <button type="submit" className="login-btn"><Lock size={16} />Iniciar SesiÃ³n</button>
         </form>
       </div>
       <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#f1f5f9', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', fontSize: '0.85rem' } }} />
@@ -85,9 +85,9 @@ function LoginScreen({ onLogin }) {
   )
 }
 
-// ══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN DASHBOARD
-// ══════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function Dashboard({ currentUser, onLogout }) {
   const [products, setProducts] = useState([])
   const [loadingIA, setLoadingIA] = useState(false)
@@ -152,11 +152,11 @@ function Dashboard({ currentUser, onLogout }) {
         const now = Date.now()
         if (lastActionTime.current[name] && (now - lastActionTime.current[name] < 1000)) continue
         lastActionTime.current[name] = now
-        addLog(`IA: ${diff > 0 ? 'Detectó' : 'Dejó de ver'} ${name} (${diff > 0 ? '+' : ''}${diff})`, diff > 0 ? 'info' : 'out')
+        addLog(`IA: ${diff > 0 ? 'DetectÃ³' : 'DejÃ³ de ver'} ${name} (${diff > 0 ? '+' : ''}${diff})`, diff > 0 ? 'info' : 'out')
         const pdb = products.find(p => p.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(p.name.toLowerCase()))
         if (pdb) {
           const newQty = Math.max(0, pdb.quantity + diff)
-          try { await axios.put(`${API_BASE}/${pdb.id}/stock`, null, { params: { quantity: newQty } }); addLog(`BD: Stock de ${name} → ${newQty}`, 'in') }
+          try { await axios.put(`${API_BASE}/${pdb.id}/stock`, null, { params: { quantity: newQty } }); addLog(`BD: Stock de ${name} â†’ ${newQty}`, 'in') }
           catch (e) { toast.error(`No se pudo guardar ${name}`) }
         } else { toast.error(`${name} no existe en la BD`) }
       }
@@ -174,7 +174,7 @@ function Dashboard({ currentUser, onLogout }) {
       const fd = new FormData(); fd.append('image', blob, 'shelf.jpg')
       const res = await fetch(API_IA, { method: 'POST', body: fd }); const data = await res.json()
       if (data.products) await processShelfChanges(data.products)
-    } catch (e) { console.error("Error conectando con la IA:", e); toast.error("Error de conexión IA"); setIsAiActive(false); } 
+    } catch (e) { console.error("Error conectando con la IA:", e); toast.error("Error de conexiÃ³n IA"); setIsAiActive(false); } 
     finally { setLoadingIA(false); isProcessing.current = false }
   }
 
@@ -194,7 +194,7 @@ function Dashboard({ currentUser, onLogout }) {
               events: [],
               endTime: null
           }
-          toast.success("Análisis IA Iniciado")
+          toast.success("AnÃ¡lisis IA Iniciado")
       } else {
           if (currentSession.current) {
               currentSession.current.endTime = new Date().toLocaleString()
@@ -203,7 +203,7 @@ function Dashboard({ currentUser, onLogout }) {
               localStorage.setItem('ucc_sessions', JSON.stringify(updatedSessions))
               currentSession.current = null
           }
-          toast.success("Análisis IA Detenido")
+          toast.success("AnÃ¡lisis IA Detenido")
       }
       setIsAiActive(!isAiActive)
   }
@@ -213,7 +213,7 @@ function Dashboard({ currentUser, onLogout }) {
   const healthyCount = products.filter(p => p.quantity > 2).length
   const getLogIcon = (t) => t === 'in' ? <CheckCircle2 size={14} color="#10b981" /> : t === 'out' ? <AlertCircle size={14} color="#ef4444" /> : <Info size={14} color="#f59e0b" />
 
-  // ── User management ──
+  // â”€â”€ User management â”€â”€
   const handleAddUser = async (e) => {
     e.preventDefault()
     if (!newUser.name || !newUser.username || !newUser.password || !newUser.supermercado) { toast.error('Completa todos los campos'); return }
@@ -228,7 +228,7 @@ function Dashboard({ currentUser, onLogout }) {
   }
 
   const handleDeleteUser = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return
+    if (!window.confirm('Â¿EstÃ¡s seguro de eliminar este usuario?')) return
     try {
       await axios.delete(`${API_USERS}/${id}`)
       toast.success('Usuario eliminado')
@@ -239,7 +239,7 @@ function Dashboard({ currentUser, onLogout }) {
   }
 
   const handleDeleteProduct = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return
+    if (!window.confirm('Â¿EstÃ¡s seguro de eliminar este producto?')) return
     try {
       await axios.delete(`${API_BASE.replace('/api/products', '/api/products')}/${id}`)
       toast.success('Producto eliminado')
@@ -249,7 +249,7 @@ function Dashboard({ currentUser, onLogout }) {
 
   const navItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Resumen' },
-    { id: 'camera', icon: Video, label: 'Cámara IA' },
+    { id: 'camera', icon: Video, label: 'CÃ¡mara IA' },
     { id: 'inventory', icon: ClipboardList, label: 'Inventario' },
     { id: 'reports', icon: BarChart3, label: 'Reportes' },
     ...(isAdmin ? [{ id: 'users', icon: Users, label: 'Usuarios' }] : []),
@@ -259,9 +259,12 @@ function Dashboard({ currentUser, onLogout }) {
     <div className="app-shell">
       <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#f1f5f9', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', fontSize: '0.85rem' } }} />
 
-      {/* SIDEBAR */}
+            {/* SIDEBAR */}
       <nav className="sidebar no-print">
-        <div className="sidebar-logo"><ScanFace size={22} color="white" /></div>
+        <div className="sidebar-logo-container">
+          <div className="sidebar-logo"><ScanFace size={22} color="white" /></div>
+          <span className="logo-text">Vision Pro</span>
+        </div>
         {navItems.map(item => (
           <div key={item.id} className={`nav-item ${activeTab === item.id ? 'active' : ''}`} onClick={() => setActiveTab(item.id)} title={item.label}>
             <item.icon size={20} />
@@ -271,8 +274,12 @@ function Dashboard({ currentUser, onLogout }) {
         <div className="sidebar-bottom">
           <div className="nav-item" onClick={() => setSoundEnabled(!soundEnabled)} title="Sonido">
             {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} color="#ef4444" />}
+            <span className="nav-label">{soundEnabled ? 'Silenciar' : 'Sonido'}</span>
           </div>
-          <div className="nav-item" onClick={onLogout} title="Cerrar Sesión"><LogOut size={18} /></div>
+          <div className="nav-item" onClick={onLogout} title="Cerrar Sesión">
+            <LogOut size={18} />
+            <span className="nav-label">Cerrar Sesión</span>
+          </div>
         </div>
       </nav>
 
@@ -281,7 +288,7 @@ function Dashboard({ currentUser, onLogout }) {
         <div className="page-header">
           <div>
             <h1>{navItems.find(i => i.id === activeTab)?.label}</h1>
-            <p className="subtitle">UCC Vision Pro • {currentUser.supermercado || 'Sistema de Inventario'}</p>
+            <p className="subtitle">UCC Vision Pro â€¢ {currentUser.supermercado || 'Sistema de Inventario'}</p>
           </div>
           <div className="header-actions no-print">
             <div className="user-logged-info"><span className="user-dot" />{currentUser.name} ({currentUser.role === 'admin' ? 'Admin' : 'Operador'})</div>
@@ -296,11 +303,11 @@ function Dashboard({ currentUser, onLogout }) {
             <div className="stat-card"><div className="stat-icon purple"><Package size={20} /></div><div className="stat-value">{products.length}</div><div className="stat-label">Total Productos</div></div>
             <div className="stat-card"><div className="stat-icon green"><TrendingUp size={20} /></div><div className="stat-value">{totalStock}</div><div className="stat-label">Stock Total</div></div>
             <div className="stat-card"><div className="stat-icon amber"><CheckCircle2 size={20} /></div><div className="stat-value">{healthyCount}</div><div className="stat-label">Stock Saludable</div></div>
-            <div className="stat-card"><div className="stat-icon red"><AlertTriangle size={20} /></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Stock Crítico</div></div>
+            <div className="stat-card"><div className="stat-icon red"><AlertTriangle size={20} /></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Stock CrÃ­tico</div></div>
           </div>
           <div className="dashboard-grid">
             <div className="glass-card">
-              <div className="card-header"><span className="card-title">Distribución de Stock</span></div>
+              <div className="card-header"><span className="card-title">DistribuciÃ³n de Stock</span></div>
               <div className="card-body">
                 <div className="chart-bars">
                   {products.map((p, i) => { const mx = Math.max(...products.map(x => x.quantity), 1); return (
@@ -323,10 +330,10 @@ function Dashboard({ currentUser, onLogout }) {
         {activeTab === 'camera' && (
             <div className="glass-card" style={{ animation: 'fadeInUp 0.5s ease', maxWidth: '800px', margin: '0 auto' }}>
               <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="card-title">Transmisión de Cámara IA</span>
+                  <span className="card-title">TransmisiÃ³n de CÃ¡mara IA</span>
                   <button onClick={toggleAI} className={`btn ${isAiActive ? 'btn-danger' : 'btn-primary'}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: isAiActive ? '#ef4444' : '#6366f1', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
                       {isAiActive ? <Square size={16} /> : <Play size={16} />}
-                      {isAiActive ? 'Detener Análisis' : 'Iniciar Análisis IA'}
+                      {isAiActive ? 'Detener AnÃ¡lisis' : 'Iniciar AnÃ¡lisis IA'}
                   </button>
               </div>
               <div className="card-body">
@@ -337,12 +344,12 @@ function Dashboard({ currentUser, onLogout }) {
                       <div className={`stream-badge ${isAiActive ? 'ai-active' : ''}`} style={{ background: isAiActive ? 'rgba(16, 185, 129, 0.9)' : 'rgba(71, 85, 105, 0.9)' }}>
                           <span className="dot" style={{ background: isAiActive ? '#fff' : '#94a3b8' }} />{isAiActive ? 'PROCESANDO' : 'EN ESPERA'}
                       </div>
-                      <div className="ai-status"><ScanFace size={14} />Visión IA</div>
+                      <div className="ai-status"><ScanFace size={14} />VisiÃ³n IA</div>
                   </div>
                   {!isAiActive && (
                       <div style={{ textAlign: 'center', padding: '1rem', color: '#94a3b8' }}>
                           <Info size={24} style={{ marginBottom: '0.5rem' }} />
-                          <p>Presiona "Iniciar Análisis IA" para comenzar a detectar productos en tiempo real.</p>
+                          <p>Presiona "Iniciar AnÃ¡lisis IA" para comenzar a detectar productos en tiempo real.</p>
                       </div>
                   )}
               </div>
@@ -354,7 +361,7 @@ function Dashboard({ currentUser, onLogout }) {
           <div className="glass-card" style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div className="card-header"><span className="card-title">Inventario de Productos</span><span style={{ fontSize: '0.72rem', color: '#475569' }}>{products.length} items</span></div>
             <div className="card-body">
-              <div className="table-header"><span>Producto</span><span>Ubicación</span><span>Cantidad</span><span>Estado</span>{isAdmin && <span>Acciones</span>}</div>
+              <div className="table-header"><span>Producto</span><span>UbicaciÃ³n</span><span>Cantidad</span><span>Estado</span>{isAdmin && <span>Acciones</span>}</div>
               <div className="inventory-grid">
                 {products.map((p, i) => (
                   <div key={p.id} className="product-row" style={{ animationDelay: `${i * 0.08}s` }}>
@@ -386,7 +393,7 @@ function Dashboard({ currentUser, onLogout }) {
                           <div className="log-empty" style={{ padding: '3rem' }}>
                               <ClipboardList size={48} color="#1e293b" style={{ marginBottom: '1rem' }} />
                               <p>No hay sesiones registradas.</p>
-                              <span style={{ fontSize: '0.8rem' }}>Inicia el análisis IA desde la pestaña de Cámara para registrar una sesión.</span>
+                              <span style={{ fontSize: '0.8rem' }}>Inicia el anÃ¡lisis IA desde la pestaÃ±a de CÃ¡mara para registrar una sesiÃ³n.</span>
                           </div>
                       ) : (
                           <div className="inventory-grid">
@@ -394,7 +401,7 @@ function Dashboard({ currentUser, onLogout }) {
                                   <div key={s.id} className="glass-card" style={{ marginBottom: '1rem', padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1rem' }}>
                                           <div>
-                                              <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#f1f5f9' }}>Sesión #{String(s.id).slice(-4)}</div>
+                                              <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#f1f5f9' }}>SesiÃ³n #{String(s.id).slice(-4)}</div>
                                               <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Eventos detectados: {s.events.length}</div>
                                           </div>
                                           <div style={{ textAlign: 'right' }}>
@@ -408,7 +415,7 @@ function Dashboard({ currentUser, onLogout }) {
                                                   <span>{ev.time}</span> - <span>{ev.msg}</span>
                                               </div>
                                           ))}
-                                          {s.events.length > 5 && <div style={{ fontSize: '0.8rem', color: '#6366f1' }}>+ {s.events.length - 5} eventos más...</div>}
+                                          {s.events.length > 5 && <div style={{ fontSize: '0.8rem', color: '#6366f1' }}>+ {s.events.length - 5} eventos mÃ¡s...</div>}
                                       </div>
                                   </div>
                               ))}
@@ -432,12 +439,12 @@ function Dashboard({ currentUser, onLogout }) {
                 <h3><UserPlus size={16} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />Nuevo Usuario</h3>
                 <form onSubmit={handleAddUser}>
                   <div className="form-row">
-                    <div className="form-group"><label className="form-label">Nombre completo</label><input className="form-input" placeholder="Ej: Juan Pérez" value={newUser.name} onChange={e => setNewUser({ ...newUser, name: e.target.value })} required /></div>
+                    <div className="form-group"><label className="form-label">Nombre completo</label><input className="form-input" placeholder="Ej: Juan PÃ©rez" value={newUser.name} onChange={e => setNewUser({ ...newUser, name: e.target.value })} required /></div>
                     <div className="form-group"><label className="form-label">Usuario</label><input className="form-input" placeholder="Ej: juanp" value={newUser.username} onChange={e => setNewUser({ ...newUser, username: e.target.value })} required /></div>
                   </div>
                   <div className="form-row">
-                    <div className="form-group"><label className="form-label">Contraseña</label><input className="form-input" type="password" placeholder="••••••••" value={newUser.password} onChange={e => setNewUser({ ...newUser, password: e.target.value })} required /></div>
-                    <div className="form-group"><label className="form-label">Supermercado (SaaS)</label><input className="form-input" placeholder="Ej: Éxito Norte" value={newUser.supermercado} onChange={e => setNewUser({ ...newUser, supermercado: e.target.value })} required /></div>
+                    <div className="form-group"><label className="form-label">ContraseÃ±a</label><input className="form-input" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" value={newUser.password} onChange={e => setNewUser({ ...newUser, password: e.target.value })} required /></div>
+                    <div className="form-group"><label className="form-label">Supermercado (SaaS)</label><input className="form-input" placeholder="Ej: Ã‰xito Norte" value={newUser.supermercado} onChange={e => setNewUser({ ...newUser, supermercado: e.target.value })} required /></div>
                   </div>
                   <div className="form-row">
                     <div className="form-group"><label className="form-label">Rol</label>
@@ -454,7 +461,7 @@ function Dashboard({ currentUser, onLogout }) {
             <div className="glass-card">
               <div className="card-header"><span className="card-title">Usuarios del Sistema</span></div>
               <div className="card-body">
-                <div className="user-table-header"><span>Usuario</span><span>Supermercado</span><span>Fecha de Creación</span><span>Rol</span><span></span></div>
+                <div className="user-table-header"><span>Usuario</span><span>Supermercado</span><span>Fecha de CreaciÃ³n</span><span>Rol</span><span></span></div>
                 <div className="inventory-grid">
                   {users.map((u, i) => (
                     <div key={u.id} className="user-row" style={{ animationDelay: `${i * 0.08}s` }}>
@@ -486,8 +493,9 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(getSession())
 
   const handleLogin = (user) => setCurrentUser(user)
-  const handleLogout = () => { clearSession(); setCurrentUser(null); toast.success('Sesi�n cerrada') }
+  const handleLogout = () => { clearSession(); setCurrentUser(null); toast.success('Sesión cerrada') }
 
   if (!currentUser) return <LoginScreen onLogin={handleLogin} />
   return <Dashboard currentUser={currentUser} onLogout={handleLogout} />
 }
+
