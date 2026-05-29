@@ -347,7 +347,7 @@ function Dashboard({ currentUser, onLogout }) {
 
         {/* CAMARA IA */}
         {activeTab === 'camera' && (
-            <div className="glass-card" style={{ animation: 'fadeInUp 0.5s ease', maxWidth: '800px', margin: '0 auto' }}>
+            <div className="glass-card" style={{ animation: 'fadeInUp 0.5s ease', maxWidth: '1000px', margin: '0 auto' }}>
               <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span className="card-title">Transmisión de Cámara IA</span>
                   <button onClick={toggleAI} className={`btn ${isAiActive ? 'btn-danger' : 'btn-primary'}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: isAiActive ? '#ef4444' : '#6366f1', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
@@ -356,10 +356,10 @@ function Dashboard({ currentUser, onLogout }) {
                       <span>{isAiActive ? 'Detener Análisis' : 'Iniciar Análisis IA'}</span>
                   </button>
               </div>
-              <div className="card-body">
-                  <div className="stream-container" style={{ height: '480px' }}>
+              <div className="card-body" style={{ display: 'flex', gap: '20px', flexDirection: window.innerWidth < 768 ? 'column' : 'row' }}>
+                  <div className="stream-container" style={{ height: '480px', flex: 2, position: 'relative' }}>
                       <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
-                          <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }} />
                       </div>
                       <div className="scan-line" style={{ display: isAiActive ? 'block' : 'none' }} />
                       <div className="stream-overlay" />
@@ -368,9 +368,41 @@ function Dashboard({ currentUser, onLogout }) {
                       </div>
                       <div className="ai-status"><ScanFace size={14} />Visión IA</div>
                   </div>
-                  <div style={{ display: isAiActive ? 'none' : 'block', textAlign: 'center', padding: '1rem', color: '#94a3b8' }}>
-                      <Info size={24} style={{ marginBottom: '0.5rem' }} />
-                      <p>Presiona "Iniciar Análisis IA" para comenzar a detectar productos en tiempo real.</p>
+                  
+                  {/* REAL-TIME DETECTION PANEL */}
+                  <div className="detection-panel" style={{ flex: 1, background: 'rgba(15, 23, 42, 0.5)', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column' }}>
+                      <h4 style={{ margin: '0 0 1rem 0', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
+                          <ScanFace size={20} color={isAiActive ? "#10b981" : "#64748b"}/> Objetos en Vista
+                      </h4>
+                      
+                      {!isAiActive ? (
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b', textAlign: 'center' }}>
+                              <EyeOff size={32} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                              <p style={{ fontSize: '0.9rem' }}>La IA está apagada.<br/>Presiona el botón superior para iniciar el escaneo en tiempo real.</p>
+                          </div>
+                      ) : Object.keys(shelfState).length === 0 ? (
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', textAlign: 'center' }}>
+                              <div className="spinner-border" style={{ marginBottom: '1rem', borderTopColor: '#10b981', width: '30px', height: '30px', border: '3px solid rgba(16,185,129,0.2)', borderTop: '3px solid #10b981', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                              <p style={{ fontSize: '0.9rem' }}>Buscando productos en la cámara...</p>
+                          </div>
+                      ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: 1, paddingRight: '5px' }}>
+                              {Object.entries(shelfState).map(([name, count], idx) => (
+                                  <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '10px', animation: `fadeInUp 0.3s ease ${idx * 0.05}s forwards` }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                          <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+                                            <img src={SMART_MAPPING[name]?.img || '/products/atun.png'} alt={name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                          </div>
+                                          <span style={{ color: '#f1f5f9', fontSize: '0.95rem', fontWeight: 500 }}>{name}</span>
+                                      </div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Cant:</span>
+                                          <span style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: '4px 10px', borderRadius: '20px', fontSize: '0.9rem', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(16,185,129,0.3)' }}>{count}</span>
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                      )}
                   </div>
               </div>
             </div>
