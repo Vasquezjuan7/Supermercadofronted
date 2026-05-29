@@ -1,10 +1,10 @@
-/* ═══════════════════════════════════════════════════════
-   UCC VISION PRO — NEXT-GEN CYBER-GLASS SYSTEM
-   ═══════════════════════════════════════════════════════ */
+﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   UCC VISION PRO â€” NEXT-GEN CYBER-GLASS SYSTEM
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
-/* ── Reset & Base ──────────────────────────────────── */
+/* â”€â”€ Reset & Base â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -72,7 +72,7 @@ body::before {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
 
-/* ── Animations ────────────────────────────────────── */
+/* â”€â”€ Animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
   to   { opacity: 1; transform: translateY(0); filter: blur(0); }
@@ -92,7 +92,7 @@ body::before {
   50% { transform: translateY(-5px); }
 }
 
-/* ── Global Utilities ──────────────────────────────── */
+/* â”€â”€ Global Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .text-gradient {
   background: var(--accent-gradient);
   -webkit-background-clip: text;
@@ -106,13 +106,13 @@ body::before {
   box-shadow: var(--shadow-card);
 }
 
-/* ── Layout ────────────────────────────────────────── */
+/* â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .app-shell {
   display: flex;
   min-height: 100vh;
 }
 
-/* ── Sidebar ───────────────────────────────────────── */
+/* â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .sidebar {
   position: fixed;
   left: 20px; top: 20px; bottom: 20px;
@@ -206,7 +206,7 @@ body::before {
 
 .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; }
 
-/* ── Main Content ──────────────────────────────────── */
+/* â”€â”€ Main Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .main-content {
   flex: 1;
   margin-left: calc(var(--sidebar-width) + 10px);
@@ -217,7 +217,7 @@ body::before {
   animation: fadeIn 0.5s ease;
 }
 
-/* ── Header ────────────────────────────────────────── */
+/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -300,7 +300,7 @@ body::before {
   box-shadow: 0 0 10px var(--accent-cyan);
 }
 
-/* ── Tarjetas Glassmorphism ────────────────────────── */
+/* â”€â”€ Tarjetas Glassmorphism â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .cyber-card {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
@@ -343,7 +343,7 @@ body::before {
 }
 .card-body { padding: 1.5rem; }
 
-/* ── Stats Row ─────────────────────────────────────── */
+/* â”€â”€ Stats Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -380,7 +380,7 @@ body::before {
 .stat-value { font-size: 2.2rem; font-weight: 800; line-height: 1; margin-bottom: 0.2rem; }
 .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
 
-/* ── HUD Cámara IA ─────────────────────────────────── */
+/* â”€â”€ HUD CÃ¡mara IA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .camera-hud {
   display: flex;
   gap: 1.5rem;
@@ -405,7 +405,7 @@ body::before {
   opacity: 0.9;
 }
 
-/* Línea láser de escaneo ultra cool */
+/* LÃ­nea lÃ¡ser de escaneo ultra cool */
 .laser-beam {
   position: absolute;
   left: 0; width: 100%; height: 3px;
@@ -485,7 +485,7 @@ body::before {
   box-shadow: 0 0 10px rgba(176,38,255,0.4);
 }
 
-/* ── Inventario Table ──────────────────────────────── */
+/* â”€â”€ Inventario Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .table-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr;
@@ -550,7 +550,7 @@ body::before {
 .status-badge.low { background: rgba(255,0,85,0.1); color: var(--danger); border: 1px solid rgba(255,0,85,0.3); box-shadow: 0 0 15px rgba(255,0,85,0.2); animation: pulseGlow 2s infinite; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-/* ── Pantalla de Carga/Vacia ───────────────────────── */
+/* â”€â”€ Pantalla de Carga/Vacia â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -574,7 +574,7 @@ body::before {
 }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
-/* ── Scrollbars & Misc ─────────────────────────────── */
+/* â”€â”€ Scrollbars & Misc â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .login-screen {
   min-height: 100vh;
   display: flex;
@@ -639,7 +639,7 @@ body::before {
 }
 .login-btn:hover { box-shadow: 0 10px 30px rgba(0,240,255,0.5); transform: translateY(-2px); }
 
-/* ── Generic Layouts ───────────────────────────────── */
+/* â”€â”€ Generic Layouts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -653,7 +653,7 @@ body::before {
   align-items: end;
 }
 
-/* ── Responsiveness (Mobile & Tablets) ─────────────── */
+/* â”€â”€ Responsiveness (Mobile & Tablets) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -840,5 +840,3 @@ body::before {
 .chat-input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 10px 15px; color: #fff; outline: none; transition: 0.3s; }
 .chat-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.2); }
 
-. m o b i l e - t o p - l o g o   {   d i s p l a y :   n o n e ;   } 
- 
