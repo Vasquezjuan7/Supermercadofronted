@@ -213,6 +213,15 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
   useEffect(() => { if (activeTab === 'users') fetchUsers() }, [activeTab, fetchUsers])
   useEffect(() => { if (activeTab === 'reports') fetchSessions() }, [activeTab, fetchSessions])
 
+  // Background Auto-Sync to keep multiple devices updated in real-time
+  useEffect(() => {
+    const syncInterval = setInterval(() => {
+      fetchProducts()
+      if (activeTab === 'reports') fetchSessions()
+    }, 2500)
+    return () => clearInterval(syncInterval)
+  }, [fetchProducts, fetchSessions, activeTab])
+
   async function setupCamera() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: 640, height: 480 } })
@@ -265,7 +274,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
   }
 
   useEffect(() => { 
-      let i; if (isAiActive) i = setInterval(captureAndDetect, 1000); 
+      let i; if (isAiActive) i = setInterval(captureAndDetect, 400); 
       return () => clearInterval(i) 
   }, [isAiActive, products, shelfState, activeTab])
 
