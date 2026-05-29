@@ -332,8 +332,9 @@ function Dashboard({ currentUser, onLogout }) {
               <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span className="card-title">Transmisión de Cámara IA</span>
                   <button onClick={toggleAI} className={`btn ${isAiActive ? 'btn-danger' : 'btn-primary'}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: isAiActive ? '#ef4444' : '#6366f1', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-                      {isAiActive ? <Square size={16} /> : <Play size={16} />}
-                      {isAiActive ? 'Detener Análisis' : 'Iniciar Análisis IA'}
+                      <span style={{ display: isAiActive ? 'flex' : 'none', alignItems: 'center' }}><Square size={16} /></span>
+                      <span style={{ display: !isAiActive ? 'flex' : 'none', alignItems: 'center' }}><Play size={16} /></span>
+                      <span>{isAiActive ? 'Detener Análisis' : 'Iniciar Análisis IA'}</span>
                   </button>
               </div>
               <div className="card-body">
