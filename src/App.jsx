@@ -338,20 +338,20 @@ function Dashboard({ currentUser, onLogout }) {
               </div>
               <div className="card-body">
                   <div className="stream-container" style={{ height: '480px' }}>
-                      <video ref={videoRef} autoPlay playsInline muted />
+                      <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+                          <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
                       <div className="scan-line" style={{ display: isAiActive ? 'block' : 'none' }} />
                       <div className="stream-overlay" />
                       <div className={`stream-badge ${isAiActive ? 'ai-active' : ''}`} style={{ background: isAiActive ? 'rgba(16, 185, 129, 0.9)' : 'rgba(71, 85, 105, 0.9)' }}>
-                          <span className="dot" style={{ background: isAiActive ? '#fff' : '#94a3b8' }} />{isAiActive ? 'PROCESANDO' : 'EN ESPERA'}
+                          <span className="dot" style={{ background: isAiActive ? '#fff' : '#94a3b8' }} /><span>{isAiActive ? 'PROCESANDO' : 'EN ESPERA'}</span>
                       </div>
                       <div className="ai-status"><ScanFace size={14} />Visión IA</div>
                   </div>
-                  {!isAiActive && (
-                      <div style={{ textAlign: 'center', padding: '1rem', color: '#94a3b8' }}>
-                          <Info size={24} style={{ marginBottom: '0.5rem' }} />
-                          <p>Presiona "Iniciar Análisis IA" para comenzar a detectar productos en tiempo real.</p>
-                      </div>
-                  )}
+                  <div style={{ display: isAiActive ? 'none' : 'block', textAlign: 'center', padding: '1rem', color: '#94a3b8' }}>
+                      <Info size={24} style={{ marginBottom: '0.5rem' }} />
+                      <p>Presiona "Iniciar Análisis IA" para comenzar a detectar productos en tiempo real.</p>
+                  </div>
               </div>
             </div>
         )}
