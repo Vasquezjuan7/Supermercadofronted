@@ -1,4 +1,4 @@
-﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    UCC VISION PRO â€” NEXT-GEN CYBER-GLASS SYSTEM
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
@@ -672,11 +672,16 @@ body::before {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 70px;
+    height: 75px;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
     padding: 0 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    z-index: 1000;
+    gap: 5px;
     border-radius: 20px 20px 0 0;
     z-index: 1000;
     box-shadow: 0 -10px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.05);
@@ -699,6 +704,8 @@ body::before {
     justify-content: center;
     flex-direction: column;
     gap: 4px;
+    flex-shrink: 0;
+    min-width: 70px;
   }
   
   .nav-label {
@@ -799,15 +806,17 @@ body::before {
   }
   .chat-sidebar {
     width: 100%;
+    height: auto;
     min-height: 60px;
     display: flex;
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 5px;
+    padding: 10px 5px;
     align-items: center;
     border-right: none;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
   }
   .chat-sidebar h3 { display: none; }
   .chat-sidebar > div[style] { display: none !important; } /* Hides inline styled labels */
@@ -815,7 +824,8 @@ body::before {
     white-space: nowrap;
     margin-bottom: 0;
     margin-right: 10px;
-    padding: 8px 12px;
+    padding: 10px 15px;
+    flex-shrink: 0;
   }
   .chat-main {
     border: none;
