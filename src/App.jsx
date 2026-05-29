@@ -308,32 +308,35 @@ function Dashboard({ currentUser, onLogout }) {
               
               <div className="detection-list">
                 <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Eye size={16} /> Targets Acquired
+                  <Eye size={16} /><span>Targets Acquired</span>
                 </h4>
-                
-                {!isAiActive ? (
-                  <div className="empty-state">
-                    <EyeOff size={40} className="empty-icon" />
-                    <p>Vision system offline.<br/>Initialize to scan area.</p>
-                  </div>
-                ) : Object.keys(shelfState).length === 0 ? (
-                  <div className="empty-state">
-                    <div className="spinner-cyber" />
-                    <p>Scanning sectors...</p>
-                  </div>
-                ) : (
-                  Object.entries(shelfState).map(([name, count], idx) => (
+
+                {/* Estado 1: IA apagada — siempre en DOM, visible/oculto por CSS */}
+                <div className="empty-state" style={{ display: !isAiActive ? 'flex' : 'none' }}>
+                  <EyeOff size={40} className="empty-icon" />
+                  <p>Vision system offline.<br/>Initialize to scan area.</p>
+                </div>
+
+                {/* Estado 2: IA activa, escaneando — siempre en DOM, visible/oculto por CSS */}
+                <div className="empty-state" style={{ display: (isAiActive && Object.keys(shelfState).length === 0) ? 'flex' : 'none' }}>
+                  <div className="spinner-cyber"></div>
+                  <p>Scanning sectors...</p>
+                </div>
+
+                {/* Estado 3: Productos detectados — siempre en DOM, visible/oculto por CSS */}
+                <div style={{ display: (isAiActive && Object.keys(shelfState).length > 0) ? 'flex' : 'none', flexDirection: 'column', gap: '10px' }}>
+                  {Object.entries(shelfState).map(([name, count], idx) => (
                     <div key={name} className="detected-item" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <div className="detected-img-wrap">
-                           <img src={SMART_MAPPING[name]?.img || '/products/atun.png'} alt={name} />
+                          <img src={SMART_MAPPING[name]?.img || '/products/atun.png'} alt={name} />
                         </div>
                         <span className="detected-name">{name}</span>
                       </div>
                       <span className="detected-qty">{count}</span>
                     </div>
-                  ))
-                )}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
