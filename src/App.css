@@ -802,7 +802,7 @@ body::before {
   /* Chat Mobile Adjustments */
   .chat-container {
     flex-direction: column;
-    height: calc(100vh - 180px); /* Leave room for bottom nav */
+    height: calc(100dvh - 250px); /* Leave room for bottom nav */
   }
   .chat-sidebar {
     width: 100%;
