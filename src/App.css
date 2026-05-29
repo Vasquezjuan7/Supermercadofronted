@@ -850,3 +850,6 @@ body::before {
 .chat-input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 10px 15px; color: #fff; outline: none; transition: 0.3s; }
 .chat-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.2); }
 
+
+.unread-dot { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; background: var(--accent-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--accent-cyan); }
+

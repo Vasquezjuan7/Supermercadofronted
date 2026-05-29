@@ -247,15 +247,67 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
     }
   }, [messages])
 
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
+  const lastSeenMsgIds = useRef<Record<string, string>>({})
+
   // Background Auto-Sync to keep multiple devices updated in real-time
   useEffect(() => {
     const syncInterval = setInterval(() => {
       fetchProducts()
       if (activeTab === 'reports') fetchSessions()
-      if (activeTab === 'chat') fetchMessages()
+      if (activeTab === 'chat') {
+        fetchMessages()
+        // Also poll for notifications in other chats
+        checkUnreadMessages()
+      }
     }, 2500)
     return () => clearInterval(syncInterval)
-  }, [fetchProducts, fetchSessions, fetchMessages, activeTab])
+  }, [fetchProducts, fetchSessions, fetchMessages, activeTab, users, currentUser, chatTarget])
+
+  const checkUnreadMessages = async () => {
+    if (!currentUser) return;
+    try {
+      // Check General
+      const resG = await axios.get(`${API_MESSAGES}/general`);
+      const msgsG = resG.data;
+      if (msgsG.length > 0) {
+        const last = msgsG[msgsG.length - 1];
+        if (last.senderId !== String(currentUser.id) && lastSeenMsgIds.current['general'] && lastSeenMsgIds.current['general'] !== last.id) {
+          if (chatTarget !== 'general') {
+            setUnreadCounts(prev => ({...prev, general: true ? 1 : 0}))
+            toast(`Nuevo mensaje en General de ${last.senderName}`, { icon: '💬', id: `msg-${last.id}` })
+          }
+        }
+        lastSeenMsgIds.current['general'] = last.id;
+      }
+      
+      // Check DMs
+      for (const u of users) {
+        if (String(u.id) === String(currentUser.id)) continue;
+        const res = await axios.get(`${API_MESSAGES}/dm/${currentUser.id}/${u.id}`);
+        const msgs = res.data;
+        if (msgs.length > 0) {
+          const last = msgs[msgs.length - 1];
+          if (last.senderId === String(u.id) && lastSeenMsgIds.current[String(u.id)] && lastSeenMsgIds.current[String(u.id)] !== last.id) {
+            if (chatTarget !== String(u.id)) {
+              setUnreadCounts(prev => ({...prev, [u.id]: true ? 1 : 0}))
+              toast(`Nuevo mensaje de ${last.senderName}`, { icon: '💬', id: `msg-${last.id}` })
+            }
+          }
+          lastSeenMsgIds.current[String(u.id)] = last.id;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Clear unread when clicking a chat
+  useEffect(() => {
+    if (chatTarget) {
+      setUnreadCounts(prev => ({...prev, [chatTarget]: 0}))
+    }
+  }, [chatTarget])
 
   async function setupCamera() {
     try {
@@ -742,15 +794,17 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
           <div className="chat-container" style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div className="chat-sidebar">
               <h3 style={{ padding: '10px', color: '#fff', fontSize: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '10px' }}>Contactos</h3>
-              <div className={`chat-contact ${chatTarget === 'general' ? 'active' : ''}`} onClick={() => setChatTarget('general')}>
+              <div className={`chat-contact ${chatTarget === 'general' ? 'active' : ''}`} onClick={() => setChatTarget('general')} style={{ position: 'relative' }}>
                 <MessageSquare size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }}/>
                 Canal General
+                {unreadCounts['general'] > 0 && <span className="unread-dot"></span>}
               </div>
               <div style={{ marginTop: '10px', padding: '10px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>USUARIOS</div>
-              {users.filter(u => u.id !== currentUser.id).map(u => (
-                <div key={u.id} className={`chat-contact ${chatTarget === u.id ? 'active' : ''}`} onClick={() => setChatTarget(String(u.id))}>
+              {users.filter(u => String(u.id) !== String(currentUser?.id)).map(u => (
+                <div key={u.id} className={`chat-contact ${chatTarget === String(u.id) ? 'active' : ''}`} onClick={() => setChatTarget(String(u.id))} style={{ position: 'relative' }}>
                   <Users size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }}/>
                   {u.name}
+                  {unreadCounts[String(u.id)] > 0 && <span className="unread-dot"></span>}
                 </div>
               ))}
             </div>
