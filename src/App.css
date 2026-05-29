@@ -829,7 +829,7 @@ body {
 
 .user-row {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr 0.5fr;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr 0.5fr;
   align-items: center;
   padding: 1rem 1.5rem;
   border-radius: var(--radius-md);
@@ -943,15 +943,15 @@ body {
 
 .user-table-header {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr 0.5fr;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr 0.5fr;
   padding: 0 1.5rem 0.75rem;
   font-size: 0.7rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   font-weight: 600;
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .user-logged-info {
