@@ -14,6 +14,47 @@ const API_IA = '/proxy/ia/detect_all'
 const SOUND_IN = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'
 const SOUND_OUT = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'
 
+// ── TYPES ─────────────────────────────────────────────
+export interface Product {
+  id: string;
+  name: string;
+  aisle: string;
+  quantity: number;
+  price: number;
+}
+
+export interface User {
+  id: string | number;
+  name: string;
+  username: string;
+  role: string;
+  supermercado: string;
+  createdAt?: string;
+  password?: string;
+}
+
+export interface LogEvent {
+  id: number;
+  msg: string;
+  type: 'in' | 'out';
+  time: string;
+}
+
+export interface Session {
+  id: number;
+  startTime: string;
+  endTime: string | null;
+  events: LogEvent[];
+}
+
+export interface RoleDef {
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+  icon: string;
+}
+
 const SMART_MAPPING = {
   "Atun": { name: "Atun", img: "/products/atun.png" },
   "Deo Pies": { name: "Deo Pies", img: "/products/talco.png" },
@@ -29,23 +70,23 @@ const SMART_MAPPING = {
   "Nucita": { name: "Nucita", img: "/products/nucita.jpg" }
 }
 
-function getSession() { 
+function getSession(): User | null { 
   const raw = sessionStorage.getItem('ucc_session')
   return raw ? JSON.parse(raw) : null 
 }
-function saveSession(user) { sessionStorage.setItem('ucc_session', JSON.stringify(user)) }
+function saveSession(user: User) { sessionStorage.setItem('ucc_session', JSON.stringify(user)) }
 function clearSession() { sessionStorage.removeItem('ucc_session') }
 
 // ═══════════════════════════════════════════════════════
 // LOGIN SCREEN
 // ═══════════════════════════════════════════════════════
-function LoginScreen({ onLogin }) {
+function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError('')
     try {
       const res = await axios.post(`${API_USERS}/login`, { username, password })
@@ -93,40 +134,40 @@ function LoginScreen({ onLogin }) {
 // ═══════════════════════════════════════════════════════
 // MAIN DASHBOARD
 // ═══════════════════════════════════════════════════════
-function Dashboard({ currentUser, onLogout }) {
-  const [products, setProducts] = useState([])
+function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () => void }) {
+  const [products, setProducts] = useState<Product[]>([])
   const [loadingIA, setLoadingIA] = useState(false)
-  const [shelfState, setShelfState] = useState({})
-  const [logs, setLogs] = useState([])
+  const [shelfState, setShelfState] = useState<Record<string, number>>({})
+  const [logs, setLogs] = useState<LogEvent[]>([])
   const [activeTab, setActiveTab] = useState('dashboard')
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
   
   const [isAiActive, setIsAiActive] = useState(false)
-  const [sessions, setSessions] = useState(JSON.parse(localStorage.getItem('ucc_sessions') || '[]'))
-  const currentSession = useRef(null)
+  const [sessions, setSessions] = useState<Session[]>(JSON.parse(localStorage.getItem('ucc_sessions') || '[]'))
+  const currentSession = useRef<Session | null>(null)
 
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', aisle: '', quantity: 10, price: 0 })
 
   const [showAddUser, setShowAddUser] = useState(false)
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState<User[]>([])
   const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'user', supermercado: currentUser.supermercado || 'Sede Principal' })
 
-  const videoRef = useRef(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   const isProcessing = useRef(false)
-  const lastActionTime = useRef({})
+  const lastActionTime = useRef<Record<string, number>>({})
   const role = currentUser.role || 'cajero'
 
   // ── Permisos por rol ──────────────────────────────────
-  const ROLES = {
+  const ROLES: Record<string, RoleDef> = {
     admin:      { label: 'Administrador', color: '#b026ff', bg: 'rgba(176,38,255,0.15)', border: 'rgba(176,38,255,0.35)', icon: '🛡️' },
     supervisor: { label: 'Supervisor',    color: '#00f0ff', bg: 'rgba(0,240,255,0.1)',   border: 'rgba(0,240,255,0.3)',   icon: '👁️' },
     inventario: { label: 'Inventario',    color: '#00ff88', bg: 'rgba(0,255,136,0.1)',   border: 'rgba(0,255,136,0.3)',   icon: '📦' },
     cajero:     { label: 'Cajero',        color: '#ffaa00', bg: 'rgba(255,170,0,0.1)',   border: 'rgba(255,170,0,0.3)',   icon: '🧾' },
   }
-  const can = (permission) => {
-    const perms = {
+  const can = (permission: string) => {
+    const perms: Record<string, string[]> = {
       see_camera:     ['admin', 'supervisor', 'cajero'],
       see_inventory:  ['admin', 'supervisor', 'inventario'],
       edit_inventory: ['admin', 'inventario'],
@@ -171,17 +212,17 @@ function Dashboard({ currentUser, onLogout }) {
     } catch (err) { console.error("Camera error") }
   }
 
-  const playSound = (url) => { if (!soundEnabled) return; const a = new Audio(url); a.volume = 0.3; a.play().catch(() => {}) }
-  const addLog = (msg, type) => {
-    const newLog = { id: Date.now(), msg, type, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+  const playSound = (url: string) => { if (!soundEnabled) return; const a = new Audio(url); a.volume = 0.3; a.play().catch(() => {}) }
+  const addLog = (msg: string, type: 'in' | 'out') => {
+    const newLog: LogEvent = { id: Date.now(), msg, type, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
     setLogs(prev => [newLog, ...prev].slice(0, 10))
     playSound(type === 'in' ? SOUND_IN : SOUND_OUT)
     if (currentSession.current) currentSession.current.events.push(newLog)
   }
 
-  const processShelfChanges = async (detectedList) => {
-    const currentCount = {}
-    detectedList.forEach(item => { const m = SMART_MAPPING[item] || { name: item }; currentCount[m.name] = (currentCount[m.name] || 0) + 1 })
+  const processShelfChanges = async (detectedList: string[]) => {
+    const currentCount: Record<string, number> = {}
+    detectedList.forEach(item => { const m = (SMART_MAPPING as any)[item] || { name: item }; currentCount[m.name] = (currentCount[m.name] || 0) + 1 })
     const allKeys = new Set([...Object.keys(shelfState), ...Object.keys(currentCount)])
     for (const name of allKeys) {
       const prev = shelfState[name] || 0, curr = currentCount[name] || 0, diff = curr - prev
@@ -207,7 +248,7 @@ function Dashboard({ currentUser, onLogout }) {
     try {
       const c = document.createElement('canvas'); c.width = 480; c.height = 360
       c.getContext('2d').drawImage(videoRef.current, 0, 0, 480, 360)
-      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.6))
+      const blob = await new Promise<Blob>((r) => c.toBlob(b => r(b as Blob), 'image/jpeg', 0.6))
       const fd = new FormData(); fd.append('image', blob, 'shelf.jpg')
       const res = await fetch(API_IA, { method: 'POST', body: fd }); const data = await res.json()
       if (data.products) await processShelfChanges(data.products)
@@ -240,19 +281,19 @@ function Dashboard({ currentUser, onLogout }) {
   const totalStock = products.reduce((s, p) => s + (p.quantity || 0), 0)
   const healthyCount = products.filter(p => p.quantity > 2).length
   const totalValue = products.reduce((s, p) => s + ((p.quantity || 0) * (p.price || 0)), 0)
-  const formatCOP = (value) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value)
+  const formatCOP = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value)
 
-  const handleAddProduct = async (e) => {
+  const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newProduct.name || !newProduct.aisle) return toast.error('Faltan campos')
     try { await axios.post(API_BASE, newProduct); setNewProduct({ name: '', aisle: '', quantity: 10, price: 0 }); setShowAddProduct(false); toast.success('Producto agregado'); fetchProducts() } catch(err) { toast.error('Error al agregar') }
   }
-  const handleDeleteProduct = async (id) => {
+  const handleDeleteProduct = async (id: string) => {
     if (!window.confirm('¿Eliminar producto?')) return
     try { await axios.delete(`${API_BASE}/${id}`); toast.success('Eliminado'); fetchProducts() } catch (e) { toast.error('Error') }
   }
 
-  const updateQuantity = async (id, newQty) => {
+  const updateQuantity = async (id: string, newQty: number) => {
     if (newQty < 0) return
     try { await axios.put(`${API_BASE}/${id}/stock`, null, { params: { quantity: newQty } }); fetchProducts() }
     catch (e) { toast.error('Error al actualizar stock') }
@@ -409,7 +450,7 @@ function Dashboard({ currentUser, onLogout }) {
                     <div key={name} className="detected-item" style={{ animationDelay: `${idx * 0.1}s` }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <div className="detected-img-wrap">
-                          <img src={SMART_MAPPING[name]?.img || '/products/atun.png'} alt={name} />
+                          <img src={(SMART_MAPPING as any)[name]?.img || '/products/atun.png'} alt={name} />
                         </div>
                         <span className="detected-name">{name}</span>
                       </div>
@@ -452,7 +493,7 @@ function Dashboard({ currentUser, onLogout }) {
                 <div className="inventory-grid">
                   {products.map((p, i) => (
                     <div key={p.id} className="product-row" style={{ gridTemplateColumns: '2fr 1fr 1fr 1.5fr 1fr auto', animationDelay: `${i * 0.05}s` }}>
-                      <div className="product-info"><img src={SMART_MAPPING[p.name]?.img || '/products/atun.png'} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">ID: {p.id.slice(-6).toUpperCase()}</div></div></div>
+                      <div className="product-info"><img src={(SMART_MAPPING as any)[p.name]?.img || '/products/atun.png'} className="product-img" /><div><div className="product-name">{p.name}</div><div className="product-category">ID: {p.id.slice(-6).toUpperCase()}</div></div></div>
                       <div style={{ color: 'var(--text-secondary)' }}>{p.aisle || 'General'}</div>
                       <div style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{formatCOP(p.price || 0)}</div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -595,7 +636,7 @@ function Dashboard({ currentUser, onLogout }) {
 }
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(getSession())
+  const [currentUser, setCurrentUser] = useState<User | null>(getSession())
   if (!currentUser) return <LoginScreen onLogin={u => setCurrentUser(u)} />
   return <Dashboard currentUser={currentUser} onLogout={() => { clearSession(); setCurrentUser(null); toast.success('Disconnected') }} />
 }
