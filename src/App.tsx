@@ -3,7 +3,7 @@ import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast'
 import {
   ScanFace, Package, PackagePlus, RefreshCcw, LayoutDashboard,
-  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus
+  ClipboardList, Users, LogOut, Trash2, UserPlus, Shield, Store, Play, Square, Video, Eye, EyeOff, Activity, AlertTriangle, CheckCircle2, Info, TrendingUp, Volume2, VolumeX, Crosshair, DollarSign, Download, Plus, Minus, MessageSquare, Send
 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import './App.css'
@@ -11,6 +11,7 @@ import './App.css'
 const API_BASE = '/proxy/backend/api/products'
 const API_USERS = '/proxy/backend/api/users'
 const API_SESSIONS = '/proxy/backend/api/sessions'
+const API_MESSAGES = '/proxy/backend/api/messages'
 const API_IA = '/proxy/ia/detect_all'
 const SOUND_IN = 'https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'
 const SOUND_OUT = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'
@@ -47,6 +48,15 @@ export interface Session {
   startTime: string;
   endTime: string | null;
   events: LogEvent[];
+}
+
+export interface ChatMessage {
+  id?: string;
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  content: string;
+  timestamp?: string;
 }
 
 export interface RoleDef {
@@ -153,6 +163,11 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
   const [users, setUsers] = useState<User[]>([])
   const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'user', supermercado: currentUser.supermercado || 'Sede Principal' })
 
+  const [chatTarget, setChatTarget] = useState('general')
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [chatInput, setChatInput] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const isProcessing = useRef(false)
   const lastActionTime = useRef<Record<string, number>>({})
@@ -196,28 +211,49 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
   }
 
   const fetchUsers = useCallback(async () => {
-    if (!isAdmin) return
     try { const res = await axios.get(API_USERS); setUsers(res.data) } catch (err) { console.error("Error fetching users") }
-  }, [isAdmin])
+  }, [])
 
   const fetchSessions = useCallback(async () => {
     if (!can('see_reports')) return
     try { const res = await axios.get(API_SESSIONS); setSessions(res.data) } catch (err) { console.error("Error fetching sessions") }
   }, [role])
 
+  const fetchMessages = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      let res;
+      if (chatTarget === 'general') {
+        res = await axios.get(`${API_MESSAGES}/general`);
+      } else {
+        res = await axios.get(`${API_MESSAGES}/dm/${currentUser.id}/${chatTarget}`);
+      }
+      setMessages(res.data);
+    } catch (err) { console.error('Error fetching messages', err) }
+  }, [chatTarget, currentUser])
+
   useEffect(() => { fetchProducts() }, [fetchProducts])
   useEffect(() => { if (activeTab === 'camera') setupCamera() }, [activeTab])
-  useEffect(() => { if (activeTab === 'users') fetchUsers() }, [activeTab, fetchUsers])
+  useEffect(() => { fetchUsers() }, [fetchUsers])
   useEffect(() => { if (activeTab === 'reports') fetchSessions() }, [activeTab, fetchSessions])
+  useEffect(() => { if (activeTab === 'chat') fetchMessages() }, [activeTab, chatTarget, fetchMessages])
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages])
 
   // Background Auto-Sync to keep multiple devices updated in real-time
   useEffect(() => {
     const syncInterval = setInterval(() => {
       fetchProducts()
       if (activeTab === 'reports') fetchSessions()
+      if (activeTab === 'chat') fetchMessages()
     }, 2500)
     return () => clearInterval(syncInterval)
-  }, [fetchProducts, fetchSessions, activeTab])
+  }, [fetchProducts, fetchSessions, fetchMessages, activeTab])
 
   async function setupCamera() {
     try {
@@ -331,10 +367,29 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
     toast.success('Datos exportados correctamente')
   }
 
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || !currentUser) return;
+    try {
+      const msg = {
+        senderId: currentUser.id,
+        senderName: currentUser.name,
+        receiverId: chatTarget,
+        content: chatInput
+      }
+      await axios.post(API_MESSAGES, msg)
+      setChatInput('')
+      fetchMessages()
+    } catch (err) {
+      toast.error('Error al enviar el mensaje')
+    }
+  }
+
   const navItems = [
     { id: 'dashboard',  icon: LayoutDashboard, label: 'Resumen' },
     ...(can('see_camera')    ? [{ id: 'camera',    icon: Crosshair,  label: 'Cámara IA'  }] : []),
     ...(can('see_inventory') ? [{ id: 'inventory', icon: Package,    label: 'Inventario' }] : []),
+    { id: 'chat', icon: MessageSquare, label: 'Comunicaciones' },
     ...(can('see_reports')   ? [{ id: 'reports',   icon: Activity,   label: 'Reportes'    }] : []),
     ...(can('see_users')     ? [{ id: 'users',     icon: Shield,     label: 'Usuarios'       }] : []),
   ]
@@ -653,6 +708,67 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
             </div>
           </div>
         )}
+
+        {/* CHAT */}
+        {activeTab === 'chat' && (
+          <div className="chat-container" style={{ animation: 'fadeInUp 0.5s ease' }}>
+            <div className="chat-sidebar">
+              <h3 style={{ padding: '10px', color: '#fff', fontSize: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '10px' }}>Contactos</h3>
+              <div className={`chat-contact ${chatTarget === 'general' ? 'active' : ''}`} onClick={() => setChatTarget('general')}>
+                <MessageSquare size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }}/>
+                Canal General
+              </div>
+              <div style={{ marginTop: '10px', padding: '10px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>USUARIOS</div>
+              {users.filter(u => u.id !== currentUser.id).map(u => (
+                <div key={u.id} className={`chat-contact ${chatTarget === u.id ? 'active' : ''}`} onClick={() => setChatTarget(String(u.id))}>
+                  <Users size={16} style={{ verticalAlign: 'middle', marginRight: '8px' }}/>
+                  {u.name}
+                </div>
+              ))}
+            </div>
+            
+            <div className="chat-main">
+              <div style={{ padding: '15px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontWeight: 'bold', color: '#fff' }}>
+                {chatTarget === 'general' ? 'Canal General' : users.find(u => String(u.id) === chatTarget)?.name || 'Cargando...'}
+              </div>
+              
+              <div className="chat-messages">
+                {messages.length === 0 ? (
+                  <div className="empty-state" style={{ margin: 'auto' }}>
+                    <MessageSquare size={32} className="empty-icon"/>
+                    <p>No hay mensajes en este chat.</p>
+                  </div>
+                ) : (
+                  messages.map(m => {
+                    const isMine = m.senderId === String(currentUser.id);
+                    return (
+                      <div key={m.id} className={`chat-bubble ${isMine ? 'sent' : 'received'}`}>
+                        {!isMine && chatTarget === 'general' && <div className="chat-bubble-name">{m.senderName}</div>}
+                        <div style={{ wordBreak: 'break-word' }}>{m.content}</div>
+                        <div className="chat-bubble-time">{m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</div>
+                      </div>
+                    )
+                  })
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <form className="chat-input-area" onSubmit={handleSendMessage}>
+                <input 
+                  type="text" 
+                  className="chat-input" 
+                  placeholder="Escribe un mensaje neurálgico..." 
+                  value={chatInput} 
+                  onChange={e => setChatInput(e.target.value)} 
+                />
+                <button type="submit" className="btn btn-primary" style={{ padding: '0 15px', borderRadius: '50%' }}>
+                  <Send size={18} />
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
 
       </main>
     </div>
