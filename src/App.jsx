@@ -18,9 +18,16 @@ const SOUND_OUT = 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview
 const SMART_MAPPING = {
   "Atun": { name: "Atun", img: "/products/atun.png" },
   "Deo Pies": { name: "Deo Pies", img: "/products/talco.png" },
+  "Talco": { name: "Deo Pies", img: "/products/talco.png" },
   "Maiz en lata": { name: "Maiz en lata", img: "/products/maiz.png" },
   "Maiz": { name: "Maiz en lata", img: "/products/maiz.png" },
-  "Talco": { name: "Deo Pies", img: "/products/talco.png" }
+  "Crema de cuerpo": { name: "Crema de cuerpo", img: "/products/crema_cuerpo.jpg" },
+  "Gelatinas": { name: "Gelatinas", img: "/products/gelatinas.jpg" },
+  "Harina pancakes": { name: "Harina pancakes", img: "/products/harina_pancakes.jpg" },
+  "Jabon de cuerpo": { name: "Jabon de cuerpo", img: "/products/jabon_cuerpo.jpg" },
+  "Mermelada de Pina": { name: "Mermelada de Pina", img: "/products/mermelada_pina.jpg" },
+  "Monster": { name: "Monster", img: "/products/monster.jpg" },
+  "Nucita": { name: "Nucita", img: "/products/nucita.jpg" }
 }
 
 function getSession() { 
