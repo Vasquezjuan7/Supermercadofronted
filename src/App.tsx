@@ -326,11 +326,11 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
   }
 
   const navItems = [
-    { id: 'dashboard',  icon: LayoutDashboard, label: 'Overview' },
-    ...(can('see_camera')    ? [{ id: 'camera',    icon: Crosshair,  label: 'Neural Camera'  }] : []),
-    ...(can('see_inventory') ? [{ id: 'inventory', icon: Package,    label: 'Inventory Core' }] : []),
-    ...(can('see_reports')   ? [{ id: 'reports',   icon: Activity,   label: 'System Logs'    }] : []),
-    ...(can('see_users')     ? [{ id: 'users',     icon: Shield,     label: 'Security'       }] : []),
+    { id: 'dashboard',  icon: LayoutDashboard, label: 'Resumen' },
+    ...(can('see_camera')    ? [{ id: 'camera',    icon: Crosshair,  label: 'Cámara IA'  }] : []),
+    ...(can('see_inventory') ? [{ id: 'inventory', icon: Package,    label: 'Inventario' }] : []),
+    ...(can('see_reports')   ? [{ id: 'reports',   icon: Activity,   label: 'Reportes'    }] : []),
+    ...(can('see_users')     ? [{ id: 'users',     icon: Shield,     label: 'Usuarios'       }] : []),
   ]
 
   return (
@@ -351,11 +351,11 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
         <div className="sidebar-bottom">
           <div className="nav-item" onClick={() => setSoundEnabled(!soundEnabled)}>
             {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} color="#ff0055" />}
-            <span className="nav-label">{soundEnabled ? 'Mute System' : 'Enable Audio'}</span>
+            <span className="nav-label">{soundEnabled ? 'Silenciar Sistema' : 'Activar Audio'}</span>
           </div>
           <div className="nav-item" onClick={onLogout}>
             <LogOut size={20} />
-            <span className="nav-label">Disconnect</span>
+            <span className="nav-label">Desconectar</span>
           </div>
         </div>
       </nav>
@@ -364,7 +364,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
         <div className="page-header">
           <div>
             <h1>{navItems.find(i => i.id === activeTab)?.label}</h1>
-            <p className="subtitle">System Node // {currentUser.supermercado || 'Main Hub'}</p>
+            <p className="subtitle">Nodo del Sistema // {currentUser.supermercado || 'Sede Principal'}</p>
           </div>
           <div className="header-actions">
             <div className="user-badge" style={{ borderColor: (ROLES[role] || ROLES.cajero).border }}>
@@ -372,23 +372,23 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
               <span>{currentUser.name}</span>
               <span style={{ padding: '2px 8px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, background: (ROLES[role] || ROLES.cajero).bg, color: (ROLES[role] || ROLES.cajero).color, border: `1px solid ${(ROLES[role] || ROLES.cajero).border}` }}>{(ROLES[role] || ROLES.cajero).label.toUpperCase()}</span>
             </div>
-            <button className="btn" onClick={fetchProducts}><RefreshCcw size={16} /><span>Sync DB</span></button>
+            <button className="btn" onClick={fetchProducts}><RefreshCcw size={16} /><span>Sincronizar</span></button>
           </div>
         </div>
 
         {/* DASHBOARD */}
         {activeTab === 'dashboard' && (<>
           <div className="stats-row">
-            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap primary"><Package size={22}/></div></div><div className="stat-value text-gradient">{products.length}</div><div className="stat-label">Total Items</div></div>
-            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap success"><TrendingUp size={22}/></div></div><div className="stat-value">{totalStock}</div><div className="stat-label">Global Stock</div></div>
-            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap" style={{ color: '#00f0ff', background: 'rgba(0,240,255,0.1)' }}><DollarSign size={22}/></div></div><div className="stat-value" style={{ fontSize: '1.4rem' }}>{formatCOP(totalValue)}</div><div className="stat-label">Inventory Value</div></div>
-            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap danger"><AlertTriangle size={22}/></div></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Critical Stock</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap primary"><Package size={22}/></div></div><div className="stat-value text-gradient">{products.length}</div><div className="stat-label">Total de Artículos</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap success"><TrendingUp size={22}/></div></div><div className="stat-value">{totalStock}</div><div className="stat-label">Stock Global</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap" style={{ color: '#00f0ff', background: 'rgba(0,240,255,0.1)' }}><DollarSign size={22}/></div></div><div className="stat-value" style={{ fontSize: '1.4rem' }}>{formatCOP(totalValue)}</div><div className="stat-label">Valor del Inventario</div></div>
+            <div className="stat-card cyber-card"><div className="stat-header"><div className="stat-icon-wrap danger"><AlertTriangle size={22}/></div></div><div className="stat-value">{alerts.length}</div><div className="stat-label">Stock Crítico</div></div>
           </div>
           
           <div className="dashboard-grid">
             {/* ANALYTICS CHART */}
             <div className="cyber-card">
-              <div className="card-header"><span className="card-title"><Activity size={16}/><span>Stock Analytics</span></span></div>
+              <div className="card-header"><span className="card-title"><Activity size={16}/><span>Análisis de Stock</span></span></div>
               <div className="card-body" style={{ height: '300px', paddingTop: '1rem' }}>
                 <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <BarChart data={products}>
@@ -408,9 +408,9 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
 
             {/* NEURAL LOGS */}
             <div className="cyber-card">
-              <div className="card-header"><span className="card-title"><Activity size={16}/><span>Neural Network Logs</span></span><span style={{color:'var(--accent-cyan)'}}>{logs.length} Events</span></div>
+              <div className="card-header"><span className="card-title"><Activity size={16}/><span>Registros Neuronales</span></span><span style={{color:'var(--accent-cyan)'}}>{logs.length} Eventos</span></div>
               <div className="card-body" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                {logs.length === 0 ? <div className="empty-state"><Activity size={32} className="empty-icon"/><p>Waiting for neural signals...</p></div> : 
+                {logs.length === 0 ? <div className="empty-state"><Activity size={32} className="empty-icon"/><p>Esperando señales neuronales...</p></div> : 
                  logs.map((log, i) => <div key={log.id} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px', background:'rgba(255,255,255,0.02)', borderLeft:`2px solid ${log.type==='in'?'#00ff88':'#ff0055'}`, marginBottom:'8px', borderRadius:'6px'}}>
                     <span style={{fontSize:'0.9rem', color:'#fff'}}>{log.msg}</span>
                     <span style={{fontSize:'0.75rem', color:'var(--text-muted)'}}>{log.time}</span>
@@ -424,9 +424,9 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
         {activeTab === 'camera' && (
           <div className="cyber-card camera-container" style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div className="card-header" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <span className="card-title"><Crosshair size={18} color="var(--accent-cyan)" /><span>Neural Vision Array</span></span>
+              <span className="card-title"><Crosshair size={18} color="var(--accent-cyan)" /><span>Matriz de Visión Neuronal</span></span>
               <button onClick={toggleAI} className={`btn ${isAiActive ? 'btn-danger' : 'btn-primary'}`}>
-                {isAiActive ? <><Square size={16}/><span>DISCONNECT</span></> : <><Play size={16}/><span>INITIALIZE AI</span></>}
+                {isAiActive ? <><Square size={16}/><span>DESCONECTAR</span></> : <><Play size={16}/><span>INICIALIZAR IA</span></>}
               </button>
             </div>
             
@@ -435,25 +435,25 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
                 <video ref={videoRef} autoPlay playsInline muted />
                 <div className={`laser-beam${isAiActive ? '' : ' laser-hidden'}`} />
                 <div className={`live-badge ${isAiActive ? 'processing' : 'idle'}`}>
-                  <span className="dot" /><span>{isAiActive ? 'ANALYZING LIVE FEED' : 'STANDBY MODE'}</span>
+                  <span className="dot" /><span>{isAiActive ? 'ANALIZANDO EN VIVO' : 'MODO DE ESPERA'}</span>
                 </div>
               </div>
               
               <div className="detection-list">
                 <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Eye size={16} /><span>Targets Acquired</span>
+                  <Eye size={16} /><span>Objetivos Detectados</span>
                 </h4>
 
                 {/* Estado 1: IA apagada — siempre en DOM, visible/oculto por CSS */}
                 <div className="empty-state" style={{ display: !isAiActive ? 'flex' : 'none' }}>
                   <EyeOff size={40} className="empty-icon" />
-                  <p>Vision system offline.<br/>Initialize to scan area.</p>
+                  <p>Sistema de visión apagado.<br/>Inicializar para escanear el área.</p>
                 </div>
 
                 {/* Estado 2: IA activa, escaneando — siempre en DOM, visible/oculto por CSS */}
                 <div className="empty-state" style={{ display: (isAiActive && Object.keys(shelfState).length === 0) ? 'flex' : 'none' }}>
                   <div className="spinner-cyber"></div>
-                  <p>Scanning sectors...</p>
+                  <p>Escaneando sectores...</p>
                 </div>
 
                 {/* Estado 3: Productos detectados — siempre en DOM, visible/oculto por CSS */}
@@ -479,29 +479,29 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
         {activeTab === 'inventory' && (
           <div style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: '1.5rem' }}>
-              <button className="btn" onClick={exportToCSV}><Download size={16}/><span>Export Data</span></button>
-              {can('edit_inventory') && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/><span>{showAddProduct ? 'Cancel' : 'Register Item'}</span></button>}
+              <button className="btn" onClick={exportToCSV}><Download size={16}/><span>Exportar Datos</span></button>
+              {can('edit_inventory') && <button className="btn btn-primary" onClick={() => setShowAddProduct(!showAddProduct)}><PackagePlus size={16}/><span>{showAddProduct ? 'Cancelar' : 'Agregar Artículo'}</span></button>}
             </div>
 
             {showAddProduct && (
               <div className="cyber-card" style={{ marginBottom: '1.5rem' }}>
-                <div className="card-header"><span className="card-title text-gradient">Register New Protocol</span></div>
+                <div className="card-header"><span className="card-title text-gradient">Registrar Nuevo Producto</span></div>
                 <div className="card-body">
                   <form className="product-form-grid" onSubmit={handleAddProduct}>
-                    <div><label className="form-label">Item Name</label><input className="form-input" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required/></div>
+                    <div><label className="form-label">Nombre</label><input className="form-input" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} required/></div>
                     <div><label className="form-label">Sector</label><input className="form-input" value={newProduct.aisle} onChange={e => setNewProduct({...newProduct, aisle: e.target.value})} required/></div>
-                    <div><label className="form-label">Price (COP)</label><input className="form-input" type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: parseFloat(e.target.value)||0})} required/></div>
-                    <div><label className="form-label">Initial Qty</label><input className="form-input" type="number" value={newProduct.quantity} onChange={e => setNewProduct({...newProduct, quantity: parseInt(e.target.value)||0})} required/></div>
-                    <button type="submit" className="btn btn-primary" style={{ padding: '12px 24px' }}>SAVE</button>
+                    <div><label className="form-label">Precio (COP)</label><input className="form-input" type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: parseFloat(e.target.value)||0})} required/></div>
+                    <div><label className="form-label">Cantidad Inicial</label><input className="form-input" type="number" value={newProduct.quantity} onChange={e => setNewProduct({...newProduct, quantity: parseInt(e.target.value)||0})} required/></div>
+                    <button type="submit" className="btn btn-primary" style={{ padding: '12px 24px' }}>GUARDAR</button>
                   </form>
                 </div>
               </div>
             )}
 
             <div className="cyber-card">
-              <div className="card-header"><span className="card-title">Database Core</span></div>
+              <div className="card-header"><span className="card-title">Base de Datos Central</span></div>
               <div className="card-body">
-                <div className={`table-header ${can('delete_product') ? 'with-delete' : ''}`}><span>Asset</span><span className="hide-mobile">Sector</span><span>Price</span><span>Quantity</span><span className="hide-mobile">Status</span>{can('delete_product') && <span>Override</span>}</div>
+                <div className={`table-header ${can('delete_product') ? 'with-delete' : ''}`}><span>Producto</span><span className="hide-mobile">Sector</span><span>Precio</span><span>Cantidad</span><span className="hide-mobile">Estado</span>{can('delete_product') && <span>Acciones</span>}</div>
                 <div className="inventory-grid">
                   {products.map((p, i) => (
                     <div key={p.id} className={`product-row ${can('delete_product') ? 'with-delete' : ''}`} style={{ animationDelay: `${i * 0.05}s` }}>
@@ -528,7 +528,7 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
           <div style={{ animation: 'fadeInUp 0.5s ease' }}>
             <div className="cyber-card">
               <div className="card-header">
-                <span className="card-title"><Activity size={16}/><span>Session History</span></span>
+                <span className="card-title"><Activity size={16}/><span>Historial de Sesiones</span></span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>{sessions.length} sesiones</span>
               </div>
               <div className="card-body">
@@ -650,5 +650,5 @@ function Dashboard({ currentUser, onLogout }: { currentUser: User, onLogout: () 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(getSession())
   if (!currentUser) return <LoginScreen onLogin={u => setCurrentUser(u)} />
-  return <Dashboard currentUser={currentUser} onLogout={() => { clearSession(); setCurrentUser(null); toast.success('Disconnected') }} />
+  return <Dashboard currentUser={currentUser} onLogout={() => { clearSession(); setCurrentUser(null); toast.success('Desconectado') }} />
 }
